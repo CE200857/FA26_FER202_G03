@@ -1,0 +1,15 @@
+.site-header { background: #fff; border-bottom: 1px solid #eee; padding: 14px 0; position: sticky; top: 0; z-index: 10; }
+.header-inner { display: flex; align-items: center; justify-content: space-between; }
+.brand-logo { font-size: 1.25rem; font-weight: 700; color: var(--primary-color); }
+.main-nav { display: flex; gap: 20px; }
+.cart-btn { background: var(--primary-color); color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+.site-main { min-height: 75vh; padding: 24px 16px; }
+.site-footer { background: #fff; border-top: 1px solid #eee; padding: 16px 0; text-align: center; font-size: 0.9rem; }
+.admin-layout { display: flex; min-height: 100vh; }
+.admin-sidebar { width: 250px; background: #2b2d42; color: #fff; padding: 20px; }
+.admin-nav { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+.admin-nav a { padding: 8px 12px; border-radius: 6px; }
+.admin-nav a.active { background: var(--primary-color); }
+.admin-content-wrapper { flex: 1; display: flex; flex-direction: column; }
+.admin-topbar { background: #fff; padding: 14px 24px; border-bottom: 1px solid #eee; font-weight: 600; }
+.admin-main { padding: 24px; flex: 1; }

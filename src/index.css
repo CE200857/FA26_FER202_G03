@@ -1,0 +1,9 @@
+:root {
+  --primary-color: #b56576;
+  --bg-light: #f9f6f7;
+  --text-dark: #2b2d42;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg-light); color: var(--text-dark); }
+a { text-decoration: none; color: inherit; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
