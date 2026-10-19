@@ -46,6 +46,14 @@ export const initialUsers = [
     phone: '0987654321',
     isActive: true,
   },
+  {
+    id: U003,
+    name: "Tài khoản bị khóa",
+    email: "locked@gmail.com",
+    password: "password123",
+    role: "Customer",
+    status: "locked"
+  }
 ];
 
 //  Module 2: Orders (Trần Thành Đạt) 
