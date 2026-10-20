@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import CustomerLayout from '../layouts/CustomerLayout';
 import AdminLayout from '../layouts/AdminLayout';
+import ProductCatalogPage from '../modules/product-management/pages/ProductCatalogPage';
+import ProductDetailPage from '../modules/product-management/pages/ProductDetailPage';
 
 const PlaceholderPage = ({ title }) => (
   <section style={{ padding: '24px', background: '#fff', borderRadius: '8px' }}>
@@ -15,8 +17,8 @@ const AppRouter = () => {
       {/* Cụm Route dành cho Khách hàng */}
       <Route element={<CustomerLayout />}>
         <Route path="/" element={<PlaceholderPage title="Danh mục Mỹ phẩm Spa & Salon (Product Catalog)" />} />
-        <Route path="/products" element={<PlaceholderPage title="Danh sách Sản phẩm" />} />
-        <Route path="/products/:id" element={<PlaceholderPage title="Chi tiết Sản phẩm" />} />
+        <Route path="/products" element={<ProductCatalogPage />} />
+        <Route path="/products/:id" element={<ProductDetailPage />} />
         <Route path="/login" element={<PlaceholderPage title="Đăng nhập" />} />
         <Route path="/register" element={<PlaceholderPage title="Đăng ký" />} />
         <Route path="/checkout" element={<PlaceholderPage title="Thanh toán Đơn hàng (Checkout)" />} />
