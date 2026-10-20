@@ -1,15 +1,496 @@
-.site-header { background: #fff; border-bottom: 1px solid #eee; padding: 14px 0; position: sticky; top: 0; z-index: 10; }
-.header-inner { display: flex; align-items: center; justify-content: space-between; }
-.brand-logo { font-size: 1.25rem; font-weight: 700; color: var(--primary-color); }
-.main-nav { display: flex; gap: 20px; }
-.cart-btn { background: var(--primary-color); color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
-.site-main { min-height: 75vh; padding: 24px 16px; }
-.site-footer { background: #fff; border-top: 1px solid #eee; padding: 16px 0; text-align: center; font-size: 0.9rem; }
-.admin-layout { display: flex; min-height: 100vh; }
-.admin-sidebar { width: 250px; background: #2b2d42; color: #fff; padding: 20px; }
-.admin-nav { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
-.admin-nav a { padding: 8px 12px; border-radius: 6px; }
-.admin-nav a.active { background: var(--primary-color); }
-.admin-content-wrapper { flex: 1; display: flex; flex-direction: column; }
-.admin-topbar { background: #fff; padding: 14px 24px; border-bottom: 1px solid #eee; font-weight: 600; }
-.admin-main { padding: 24px; flex: 1; }
+/* ==============================
+   GLOBAL LAYOUT
+   ============================== */
+.app-shell {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+.customer-layout,
+.admin-layout {
+    background: #fbf8f5;
+    color: #493832;
+}
+
+.customer-layout {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+img,
+video,
+iframe {
+    max-width: 100%;
+}
+
+/* ==============================
+   CUSTOMER HEADER
+   ============================== */
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-shrink: 0;
+    width: 100%;
+    background: #fff;
+    border-bottom: 1px solid #eadfd8;
+    box-shadow: 0 2px 8px rgb(73 56 50 / 5%);
+}
+
+.header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 18px;
+    width: 100%;
+    min-width: 0;
+    min-height: 76px;
+    padding: 12px 28px;
+}
+
+.brand-logo {
+    flex-shrink: 0;
+    color: #493832;
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.brand-logo:hover {
+    color: #9e5c60;
+}
+
+.main-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 22px;
+    min-width: 0;
+}
+
+.main-nav a {
+    color: #796c65;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.main-nav a:hover,
+.main-nav a.active {
+    color: #b87578;
+}
+
+/* Cart button: chỉ hiển thị chữ Giỏ hàng */
+
+.cart-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-shrink: 0;
+    padding: 10px 16px;
+    border: 1px solid #b87578;
+    border-radius: 8px;
+    background: #b87578;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.cart-btn:hover {
+    border-color: #9e5c60;
+    background: #9e5c60;
+    color: #fff;
+}
+
+.cart-btn:focus-visible,
+.main-nav a:focus-visible,
+.admin-nav a:focus-visible,
+.back-to-store:focus-visible {
+    outline: 2px solid #b87578;
+    outline-offset: 3px;
+}
+
+/* ==============================
+   CUSTOMER MAIN CONTENT
+   ============================== */
+
+.site-main {
+    flex: 1 0 auto;
+    width: 100%;
+    min-width: 0;
+    padding: 28px;
+}
+
+/* Prevent long content from forcing horizontal overflow */
+
+.site-main > *,
+.admin-main > * {
+    min-width: 0;
+    max-width: 100%;
+}
+
+/* ==============================
+   FOOTER
+   ============================== */
+
+.site-footer {
+    flex-shrink: 0;
+    width: 100%;
+    margin-top: auto;
+    background: #493832;
+    color: #fffaf6;
+}
+
+.site-footer .container {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+}
+
+.footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 22px 24px 18px;
+}
+
+.footer-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    text-align: center;
+}
+
+.footer-section h3 {
+    margin: 0;
+    color: #f1d8cc;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.footer-section p,
+.footer-section a {
+    margin: 0;
+    color: #f1e7e1;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+}
+
+.footer-section a:hover {
+    color: #fff;
+}
+
+.footer-bottom {
+    width: 100%;
+    padding: 12px 16px;
+    border-top: 1px solid rgb(255 255 255 / 14%);
+    color: #e8dcd5;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+/* ==============================
+   ADMIN LAYOUT
+   ============================== */
+
+.admin-layout {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+.admin-body {
+    display: flex;
+    align-items: stretch;
+    flex: 1 0 auto;
+    width: 100%;
+    min-width: 0;
+}
+
+/* Sidebar */
+
+.admin-sidebar {
+    flex: 0 0 200px;
+    width: 200px;
+    min-width: 0;
+    padding: 22px 12px;
+    background: #493832;
+    color: #fffaf6;
+}
+
+.admin-brand {
+    display: block;
+    margin: 0 0 22px;
+    color: #fffaf6;
+    font-size: 1.2rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+}
+
+.admin-brand:hover {
+    color: #f1d8cc;
+}
+
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.admin-nav a {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 7px;
+    color: #f0e4dd;
+    font-size: 0.94rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.admin-nav a:hover {
+    background: rgb(255 255 255 / 10%);
+    color: #fff;
+}
+
+.admin-nav a.active {
+    background: #b87578;
+    color: #fff;
+}
+
+.admin-nav hr {
+    width: 100%;
+    margin: 16px 0;
+    border: 0;
+    border-top: 1px solid rgb(255 255 255 / 18%);
+}
+
+/* Admin content and topbar */
+
+.admin-content-wrapper {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.admin-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    width: 100%;
+    min-width: 0;
+    min-height: 88px;
+    padding: 18px 28px;
+    background: #fff;
+    border-bottom: 1px solid #eadfd8;
+}
+
+.admin-topbar-title {
+    min-width: 0;
+}
+
+.admin-eyebrow {
+    display: block;
+    margin-bottom: 4px;
+    color: #796c65;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+}
+
+.admin-topbar-title h1 {
+    margin: 0;
+    color: #493832;
+    font-size: 1.15rem;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+}
+
+.back-to-store {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 10px 14px;
+    border: 1px solid #eadfd8;
+    border-radius: 8px;
+    background: #fff;
+    color: #493832;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.back-to-store:hover {
+    border-color: #d9b8b1;
+    background: #f7eee9;
+}
+
+.admin-main {
+    flex: 1 0 auto;
+    width: 100%;
+    min-width: 0;
+    padding: 28px;
+}
+
+/* ==============================
+   TABLET
+   ============================== */
+
+@media (max-width: 900px) {
+    .header-inner {
+        justify-content: center;
+        gap: 14px;
+    }
+
+    .main-nav {
+        gap: 14px;
+    }
+
+    .admin-sidebar {
+        flex-basis: 180px;
+        width: 180px;
+        padding: 20px 10px;
+    }
+
+    .admin-topbar {
+        padding: 18px 20px;
+    }
+
+    .site-main,
+    .admin-main {
+        padding: 24px 20px;
+    }
+}
+
+/* ==============================
+   MOBILE
+   ============================== */
+
+@media (max-width: 700px) {
+    .header-inner {
+        flex-direction: column;
+        align-items: center;
+        padding: 16px;
+    }
+
+    .brand-logo {
+        max-width: 100%;
+        text-align: center;
+        white-space: normal;
+    }
+
+    .main-nav {
+        justify-content: center;
+        gap: 12px 16px;
+        width: 100%;
+    }
+
+    .cart-btn {
+        max-width: 100%;
+    }
+
+    .site-main {
+        padding: 20px 16px;
+    }
+
+    .footer-content {
+        padding: 18px 16px 14px;
+    }
+
+    /* Sidebar chuyển lên trên nội dung, tránh tràn ngang */
+
+    .admin-body {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        flex: 0 0 auto;
+        width: 100%;
+        padding: 16px;
+    }
+
+    .admin-brand {
+        margin-bottom: 16px;
+    }
+
+    .admin-nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    .admin-nav a {
+        min-width: 0;
+        padding: 10px;
+    }
+
+    .admin-topbar {
+        padding: 16px;
+    }
+
+    .admin-main {
+        padding: 20px 16px;
+    }
+}
+
+/* ==============================
+   SMALL MOBILE
+   ============================== */
+
+@media (max-width: 380px) {
+    .main-nav {
+        gap: 10px 12px;
+    }
+
+    .admin-nav {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .admin-topbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

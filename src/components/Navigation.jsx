@@ -15,10 +15,10 @@ export const Navigation = ({ layout = "horizontal" }) => {
 
   const adminLinks = [
     { to: "/admin/dashboard", label: "📊 Bảng điều khiển (Dashboard)" },
-    { to: "/admin/products", label: "🧴 Quản lý Sản phẩm (M1)" },
-    { to: "/admin/orders", label: "🧾 Quản lý Đơn hàng (M2)" },
-    { to: "/admin/users", label: "👥 Quản lý Tài khoản (M3)" },
-    { to: "/admin/vouchers", label: "🏷️ Quản lý Voucher (M4)" },
+    { to: "/admin/products", label: "🧴 Sản phẩm (M1)" },
+    { to: "/admin/orders", label: "🧾 Đơn hàng (M2)" },
+    { to: "/admin/users", label: "👥 Tài khoản (M3)" },
+    { to: "/admin/vouchers", label: "🏷️ Voucher (M4)" },
     { to: "/admin/reviews", label: "⭐ Kiểm duyệt Đánh giá (M5)" },
     { to: "/products", label: "🛍️ Xem giao diện Cửa hàng" },
   ];
