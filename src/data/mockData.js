@@ -47,7 +47,7 @@ export const initialUsers = [
     isActive: true,
   },
   {
-    id: U003,
+    id: 'U003',
     name: "Tài khoản bị khóa",
     email: "locked@gmail.com",
     password: "password123",

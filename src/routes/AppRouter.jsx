@@ -26,13 +26,32 @@ const AppRouter = () => {
       </Route>
 
       {/* Cụm Route dành cho Admin / Manager */}
+
       <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<PlaceholderPage title="Admin Dashboard" />} />
-        <Route path="products" element={<PlaceholderPage title="Quản lý Sản phẩm (CRUD)" />} />
-        <Route path="orders" element={<PlaceholderPage title="Quản lý Đơn hàng" />} />
-        <Route path="users" element={<PlaceholderPage title="Quản lý Người dùng" />} />
-        <Route path="vouchers" element={<PlaceholderPage title="Quản lý Khuyến mãi & Voucher" />} />
-        <Route path="reviews" element={<PlaceholderPage title="Kiểm duyệt Đánh giá & Phản hồi" />} />
+        <Route
+          index
+          element={<PlaceholderPage title="Tổng quan hệ thống" />}
+        />
+        <Route
+          path="products"
+          element={<PlaceholderPage title="Quản lý sản phẩm" />}
+        />
+        <Route
+          path="orders"
+          element={<PlaceholderPage title="Quản lý đơn hàng" />}
+        />
+        <Route
+          path="users"
+          element={<PlaceholderPage title="Quản lý tài khoản" />}
+        />
+        <Route
+          path="vouchers"
+          element={<PlaceholderPage title="Quản lý voucher" />}
+        />
+        <Route
+          path="reviews"
+          element={<PlaceholderPage title="Quản lý đánh giá" />}
+        />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
