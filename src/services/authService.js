@@ -61,7 +61,7 @@ export const authService = {
       email: newUser.email,
       role: newUser.role,
     };
-    localStorage.setItem("currentUser", JSON.stringify(userInfo));
+    storageService.set(STORAGE_KEYS.CURRENT_USER, userInfo);
 
     return userInfo;
   },
