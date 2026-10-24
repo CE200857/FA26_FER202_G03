@@ -40,13 +40,18 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+    const updateUser = (updatedUser) => {
+        setUser(updatedUser);
+    };
+
     const contextValue = {
         user,
         isAuthenticated: !!user,
         isAdmin: user?.role === 'Admin',
         login,
         register,
-        logout
+        logout,
+        updateUser
     };
 
     return (
