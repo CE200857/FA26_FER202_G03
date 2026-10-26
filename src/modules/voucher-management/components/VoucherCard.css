@@ -1,0 +1,133 @@
+.my-voucher-card {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #eadfd8;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgb(73 56 50 / 5%);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.my-voucher-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 18px rgb(73 56 50 / 10%);
+}
+
+.my-voucher-discount {
+  display: flex;
+  flex: 0 0 110px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 20px 12px;
+  border-right: 1px dashed #d9c4b9;
+  background: #f7eee9;
+  color: #9c6265;
+  text-align: center;
+}
+
+.my-voucher-discount span {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.my-voucher-discount strong {
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.my-voucher-content {
+  flex: 1;
+  min-width: 0;
+  padding: 18px;
+}
+
+.my-voucher-label {
+  color: #9c7770;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.my-voucher-code {
+  margin: 5px 0 16px;
+  color: #493832;
+  font-size: 1.25rem;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.my-voucher-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.my-voucher-details p {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  color: #796c65;
+  font-size: 0.88rem;
+}
+
+.my-voucher-details strong {
+  color: #493832;
+  font-weight: 600;
+  text-align: right;
+}
+
+@media (max-width: 480px) {
+  .my-voucher-discount {
+    flex-basis: 85px;
+    padding: 16px 8px;
+  }
+
+  .my-voucher-discount strong {
+    font-size: 1.6rem;
+  }
+
+  .my-voucher-content {
+    padding: 14px 12px;
+  }
+
+  .my-voucher-details p {
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .my-voucher-details strong {
+    text-align: left;
+  }
+}
+
+.my-voucher-claim-button {
+  width: 100%;
+  margin-top: 18px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #9c6265;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.my-voucher-claim-button:hover:not(:disabled) {
+  background: #845154;
+}
+
+.my-voucher-claim-button:disabled {
+  background: #e9dfda;
+  color: #796c65;
+  cursor: not-allowed;
+}
