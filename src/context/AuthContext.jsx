@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
     const contextValue = {
         user,
         isAuthenticated: !!user,
-        isAdmin: user?.role === 'Admin',
+        isAdmin: user?.role === 'admin',
         login,
         register,
         logout

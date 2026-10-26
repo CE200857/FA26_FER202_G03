@@ -1,0 +1,139 @@
+.voucher-management {
+  width: 100%;
+  min-width: 0;
+  color: #493832;
+}
+
+.voucher-page-header {
+  margin-bottom: 24px;
+}
+
+.voucher-page-header h2 {
+  margin: 0 0 8px;
+  color: #493832;
+  font-size: 1.5rem;
+}
+
+.voucher-page-header p {
+  margin: 0;
+  color: #796c65;
+}
+
+.voucher-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.voucher-toolbar input,
+.voucher-toolbar select {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #eadfd8;
+  border-radius: 8px;
+  background: #fff;
+  color: #493832;
+  font: inherit;
+}
+
+.voucher-toolbar input {
+  flex: 1 1 240px;
+}
+
+.voucher-toolbar select {
+  flex: 0 1 200px;
+}
+
+.voucher-toolbar input:focus,
+.voucher-toolbar select:focus {
+  border-color: #b87578;
+  outline: 2px solid rgb(184 117 120 / 15%);
+}
+
+.voucher-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #eadfd8;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.voucher-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.voucher-table th,
+.voucher-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0e7e1;
+  white-space: nowrap;
+}
+
+.voucher-table th {
+  background: #f7eee9;
+  color: #493832;
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+.voucher-table td {
+  color: #62534c;
+  font-size: 0.92rem;
+}
+
+.voucher-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.voucher-table tbody tr:hover {
+  background: #fdfaf8;
+}
+
+.voucher-status {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.voucher-status-active {
+  background: #e7f3e8;
+  color: #32633b;
+}
+
+.voucher-status-inactive {
+  background: #f3e8e5;
+  color: #895452;
+}
+
+.voucher-empty {
+  padding: 28px 16px !important;
+  color: #796c65 !important;
+  text-align: center;
+}
+
+.voucher-count {
+  margin-top: 12px;
+  color: #796c65;
+  font-size: 0.88rem;
+}
+
+@media (max-width: 600px) {
+  .voucher-page-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .voucher-toolbar {
+    flex-direction: column;
+  }
+
+  .voucher-toolbar input,
+  .voucher-toolbar select {
+    width: 100%;
+    flex-basis: auto;
+  }
+}

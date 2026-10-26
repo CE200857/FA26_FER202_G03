@@ -1,0 +1,70 @@
+.my-vouchers-page {
+  width: 100%;
+  min-width: 0;
+  color: #493832;
+}
+
+.my-vouchers-header {
+  margin-bottom: 20px;
+}
+
+.my-vouchers-header h2 {
+  margin: 0 0 8px;
+  color: #493832;
+  font-size: 1.5rem;
+}
+
+.my-vouchers-header p {
+  margin: 0;
+  color: #796c65;
+  line-height: 1.6;
+}
+
+.my-vouchers-count {
+  margin: 0 0 16px;
+  color: #796c65;
+  font-size: 0.9rem;
+}
+
+.my-vouchers-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 320px), 1fr)
+  );
+  gap: 18px;
+}
+
+.my-vouchers-empty {
+  padding: 40px 20px;
+  border: 1px dashed #d9c4b9;
+  border-radius: 12px;
+  background: #fff;
+  text-align: center;
+}
+
+.my-vouchers-empty h3 {
+  margin: 0 0 10px;
+  color: #493832;
+  font-size: 1.1rem;
+}
+
+.my-vouchers-empty p {
+  margin: 0;
+  color: #796c65;
+  line-height: 1.6;
+}
+
+.my-vouchers-error {
+  color: #a33d3d;
+}
+
+@media (max-width: 600px) {
+  .my-vouchers-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .my-vouchers-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
