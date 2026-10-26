@@ -1,48 +1,51 @@
-// src/modules/review-management/components/ReviewItem.jsx
 import React from 'react';
-import { reviewService } from '../../../services/reviewService';
 
-const ReviewItem = ({ review, currentUser, onReviewChanged }) => {
-  const isOwner = currentUser && currentUser.id === review.userId;
-
-  const handleDelete = async () => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa đánh giá này?")) {
-      try {
-        await reviewService.deleteReview(review.id, currentUser.id);
-        onReviewChanged(); // Trigger reload list
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-  };
+const ReviewItem = ({ review, currentUserId, onEdit, onDelete }) => {
+  const isOwner = currentUserId && review.userId === currentUserId;
 
   return (
-    <div className="review-item border-b py-4">
-      <div className="flex justify-between items-center mb-1">
-        <span className="font-semibold">{review.userName}</span>
-        <span className="text-sm text-gray-500">
-          {new Date(review.createdAt).toLocaleDateString()}
-        </span>
-      </div>
-      
-      <div className="text-yellow-500 mb-2">
-        {"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}
-      </div>
-      
-      <p className="text-gray-700">{review.comment}</p>
-
-      {/* Chỉ hiện nút Xóa nếu là người tạo đánh giá */}
-      {isOwner && (
-        <div className="mt-2">
-          <button 
-            onClick={handleDelete}
-            className="text-red-500 text-sm hover:underline"
-          >
-            Xóa đánh giá
-          </button>
-          {/* Bạn có thể thêm nút Update ở đây nếu cần */}
+    <div className="border-b border-gray-200 py-4 last:border-b-0">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center space-x-3">
+          <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-600 font-bold flex items-center justify-center text-sm">
+            {review.userName ? review.userName.charAt(0).toUpperCase() : 'U'}
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-gray-800">{review.userName || 'Người dùng'}</h4>
+            <div className="flex items-center space-x-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span key={star} className={star <= review.rating ? 'text-yellow-400 text-xs' : 'text-gray-300 text-xs'}>
+                  ★
+                </span>
+              ))}
+              <span className="text-xs text-gray-400 ml-2">
+                {review.createdAt ? new Date(review.createdAt).toLocaleDateString('vi-VN') : ''}
+              </span>
+            </div>
+          </div>
         </div>
-      )}
+
+        {/* Nút Sửa / Xóa cho chủ bài viết */}
+        {isOwner && (
+          <div className="flex items-center space-x-2 text-xs">
+            <button
+              onClick={() => onEdit(review)}
+              className="text-blue-600 hover:underline font-medium"
+            >
+              Sửa
+            </button>
+            <span className="text-gray-300">|</span>
+            <button
+              onClick={() => onDelete(review.id)}
+              className="text-red-600 hover:underline font-medium"
+            >
+              Xóa
+            </button>
+          </div>
+        )}
+      </div>
+
+      <p className="text-sm text-gray-700 mt-2 leading-relaxed">{review.comment}</p>
     </div>
   );
 };
