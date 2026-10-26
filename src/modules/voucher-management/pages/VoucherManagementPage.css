@@ -137,3 +137,24 @@
     flex-basis: auto;
   }
 }
+
+.voucher-create-button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  color: #ffffff;
+  background: #98618f;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.voucher-create-button:hover {
+  background: #804d77;
+}
+
+.voucher-success {
+  margin: 16px 0;
+  color: #067647;
+  font-size: 14px;
+}

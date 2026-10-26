@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { voucherService } from '../../../services/voucherService';
+import VoucherForm from '../components/VoucherForm';
 import './VoucherManagementPage.css';
 
 const formatCurrency = (amount) =>
@@ -20,6 +21,9 @@ const VoucherManagementPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [error, setError] = useState('');
+    const [showCreateForm, setShowCreateForm] = useState(false);
+    const [createError, setCreateError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
 
     useEffect(() => {
         try {
@@ -42,6 +46,40 @@ const VoucherManagementPage = () => {
         return matchesSearch && matchesStatus;
     });
 
+    const handleCreateVoucher = (voucherData) => {
+        try {
+            const newVoucher = voucherService.create(voucherData);
+
+            setVouchers(voucherService.getAll());
+            setShowCreateForm(false);
+            setCreateError('');
+            setSuccessMessage(
+                `Tạo voucher ${newVoucher.code} thành công.`
+            );
+
+            setSearchTerm('');
+            setStatusFilter('all');
+        } catch (createError) {
+            setCreateError(
+                createError instanceof Error
+                    ? createError.message
+                    : 'Không thể tạo voucher.'
+            );
+            setSuccessMessage('');
+        }
+    };
+
+    const handleOpenCreateForm = () => {
+        setShowCreateForm(true);
+        setCreateError('');
+        setSuccessMessage('');
+    };
+
+    const handleCancelCreate = () => {
+        setShowCreateForm(false);
+        setCreateError('');
+    };
+
     return (
         <section className="voucher-management">
             <div className="voucher-page-header">
@@ -49,7 +87,36 @@ const VoucherManagementPage = () => {
                     <h2>Quản lý voucher</h2>
                     <p>Quản lý mã giảm giá của cửa hàng.</p>
                 </div>
+
+                <button
+                    type="button"
+                    className="voucher-create-button"
+                    onClick={
+                        showCreateForm
+                            ? handleCancelCreate
+                            : handleOpenCreateForm
+                    }
+                >
+                    {showCreateForm ? 'Đóng biểu mẫu' : '+ Tạo voucher'}
+                </button>
             </div>
+
+            {successMessage && (
+                <p className="voucher-success" role="status">
+                    {successMessage}
+                </p>
+            )}
+
+            {error && <p role="alert">{error}</p>}
+
+            {showCreateForm && (
+                <VoucherForm
+                    onSubmit={handleCreateVoucher}
+                    onCancel={handleCancelCreate}
+                    error={createError}
+                    onClearError={() => setCreateError('')}
+                />
+            )}
 
             <div className="voucher-toolbar">
                 <input
@@ -71,8 +138,6 @@ const VoucherManagementPage = () => {
                 </select>
             </div>
 
-            {error && <p role="alert">{error}</p>}
-
             <div className="voucher-table-wrapper">
                 <table className="voucher-table">
                     <thead>
@@ -93,7 +158,9 @@ const VoucherManagementPage = () => {
                                     <strong>{voucher.code}</strong>
                                 </td>
                                 <td>{voucher.discountPercent}%</td>
-                                <td>{formatCurrency(voucher.minOrderValue)}</td>
+                                <td>
+                                    {formatCurrency(voucher.minOrderValue)}
+                                </td>
                                 <td>{formatDate(voucher.expiryDate)}</td>
                                 <td>
                                     {voucher.usedCount}/{voucher.usageLimit}
@@ -106,7 +173,9 @@ const VoucherManagementPage = () => {
                                                 : 'voucher-status voucher-status-inactive'
                                         }
                                     >
-                                        {voucher.isActive ? 'Đang hoạt động' : 'Đã tắt'}
+                                        {voucher.isActive
+                                            ? 'Đang hoạt động'
+                                            : 'Đã tắt'}
                                     </span>
                                 </td>
                             </tr>
