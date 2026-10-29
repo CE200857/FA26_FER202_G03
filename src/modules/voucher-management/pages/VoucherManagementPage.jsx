@@ -22,8 +22,11 @@ const VoucherManagementPage = () => {
     const [statusFilter, setStatusFilter] = useState('all');
     const [error, setError] = useState('');
     const [showCreateForm, setShowCreateForm] = useState(false);
+    const [editingVoucher, setEditingVoucher] = useState(null);
     const [createError, setCreateError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+
+    const showVoucherForm = showCreateForm || Boolean(editingVoucher);
 
     useEffect(() => {
         try {
@@ -46,38 +49,63 @@ const VoucherManagementPage = () => {
         return matchesSearch && matchesStatus;
     });
 
-    const handleCreateVoucher = (voucherData) => {
-        try {
-            const newVoucher = voucherService.create(voucherData);
-
-            setVouchers(voucherService.getAll());
-            setShowCreateForm(false);
-            setCreateError('');
-            setSuccessMessage(
-                `Tạo voucher ${newVoucher.code} thành công.`
-            );
-
-            setSearchTerm('');
-            setStatusFilter('all');
-        } catch (createError) {
-            setCreateError(
-                createError instanceof Error
-                    ? createError.message
-                    : 'Không thể tạo voucher.'
-            );
-            setSuccessMessage('');
-        }
-    };
-
     const handleOpenCreateForm = () => {
+        setEditingVoucher(null);
         setShowCreateForm(true);
         setCreateError('');
         setSuccessMessage('');
     };
 
-    const handleCancelCreate = () => {
+    const handleOpenEditForm = (voucher) => {
+        setEditingVoucher(voucher);
         setShowCreateForm(false);
         setCreateError('');
+        setSuccessMessage('');
+    };
+
+    const handleCancelForm = () => {
+        setShowCreateForm(false);
+        setEditingVoucher(null);
+        setCreateError('');
+    };
+
+    const handleSubmitVoucher = (voucherData) => {
+        try {
+            if (editingVoucher) {
+                const updatedVoucher = voucherService.update(
+                    editingVoucher.id,
+                    voucherData
+                );
+
+                setVouchers(voucherService.getAll());
+                setSuccessMessage(
+                    `Cập nhật voucher ${updatedVoucher.code} thành công.`
+                );
+            } else {
+                const newVoucher = voucherService.create(voucherData);
+
+                setVouchers(voucherService.getAll());
+                setSuccessMessage(
+                    `Tạo voucher ${newVoucher.code} thành công.`
+                );
+
+                setSearchTerm('');
+                setStatusFilter('all');
+            }
+
+            setShowCreateForm(false);
+            setEditingVoucher(null);
+            setCreateError('');
+        } catch (submitError) {
+            const action = editingVoucher ? 'cập nhật' : 'tạo';
+
+            setCreateError(
+                submitError instanceof Error
+                    ? submitError.message
+                    : `Không thể ${action} voucher.`
+            );
+            setSuccessMessage('');
+        }
     };
 
     return (
@@ -92,12 +120,12 @@ const VoucherManagementPage = () => {
                     type="button"
                     className="voucher-create-button"
                     onClick={
-                        showCreateForm
-                            ? handleCancelCreate
+                        showVoucherForm
+                            ? handleCancelForm
                             : handleOpenCreateForm
                     }
                 >
-                    {showCreateForm ? 'Đóng biểu mẫu' : '+ Tạo voucher'}
+                    {showVoucherForm ? 'Đóng biểu mẫu' : '+ Tạo voucher'}
                 </button>
             </div>
 
@@ -109,10 +137,12 @@ const VoucherManagementPage = () => {
 
             {error && <p role="alert">{error}</p>}
 
-            {showCreateForm && (
+            {showVoucherForm && (
                 <VoucherForm
-                    onSubmit={handleCreateVoucher}
-                    onCancel={handleCancelCreate}
+                    key={editingVoucher?.id ?? 'create'}
+                    initialData={editingVoucher}
+                    onSubmit={handleSubmitVoucher}
+                    onCancel={handleCancelForm}
                     error={createError}
                     onClearError={() => setCreateError('')}
                 />
@@ -148,6 +178,7 @@ const VoucherManagementPage = () => {
                             <th>Hạn sử dụng</th>
                             <th>Lượt sử dụng</th>
                             <th>Trạng thái</th>
+                            <th>Thao tác</th>
                         </tr>
                     </thead>
 
@@ -157,14 +188,19 @@ const VoucherManagementPage = () => {
                                 <td>
                                     <strong>{voucher.code}</strong>
                                 </td>
+
                                 <td>{voucher.discountPercent}%</td>
+
                                 <td>
                                     {formatCurrency(voucher.minOrderValue)}
                                 </td>
+
                                 <td>{formatDate(voucher.expiryDate)}</td>
+
                                 <td>
                                     {voucher.usedCount}/{voucher.usageLimit}
                                 </td>
+
                                 <td>
                                     <span
                                         className={
@@ -178,12 +214,27 @@ const VoucherManagementPage = () => {
                                             : 'Đã tắt'}
                                     </span>
                                 </td>
+
+                                <td>
+                                    <button
+                                        type="button"
+                                        className="voucher-edit-button"
+                                        onClick={() =>
+                                            handleOpenEditForm(voucher)
+                                        }
+                                    >
+                                        Edit
+                                    </button>
+                                </td>
                             </tr>
                         ))}
 
                         {filteredVouchers.length === 0 && (
                             <tr>
-                                <td colSpan={6} className="voucher-empty">
+                                <td
+                                    colSpan={7}
+                                    className="voucher-empty"
+                                >
                                     Không tìm thấy voucher phù hợp.
                                 </td>
                             </tr>
