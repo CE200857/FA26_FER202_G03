@@ -10,25 +10,30 @@ const getTodayDate = () => {
     return `${year}-${month}-${day}`;
 };
 
-const initialFormData = {
-    code: '',
-    discountPercent: '10',
-    minOrderValue: '0',
-    expiryDate: '',
-    usageLimit: '50',
-    isActive: true,
-};
+const getInitialFormData = (voucher) => ({
+    code: voucher?.code ?? '',
+    discountPercent: String(voucher?.discountPercent ?? 10),
+    minOrderValue: String(voucher?.minOrderValue ?? 0),
+    expiryDate: voucher?.expiryDate ?? '',
+    usageLimit: String(voucher?.usageLimit ?? 50),
+    isActive: voucher?.isActive ?? true,
+});
 
 const VoucherForm = ({
     onSubmit,
     onCancel,
     error,
     onClearError,
+    initialData = null,
 }) => {
-    const [formData, setFormData] = useState(initialFormData);
+    const [formData, setFormData] = useState(
+        () => getInitialFormData(initialData)
+    );
     const [validationError, setValidationError] = useState('');
 
     const today = getTodayDate();
+    const isEditing = Boolean(initialData);
+    const usedCount = initialData?.usedCount ?? 0;
 
     const handleChange = (event) => {
         const { name, value, type, checked } = event.target;
@@ -81,16 +86,33 @@ const VoucherForm = ({
             return;
         }
 
-        if (!formData.expiryDate || formData.expiryDate < today) {
+        const isOldExpiryDateUnchanged =
+            isEditing &&
+            formData.expiryDate === initialData.expiryDate;
+
+        if (
+            !formData.expiryDate ||
+            (formData.expiryDate < today && !isOldExpiryDateUnchanged)
+        ) {
             setValidationError(
                 'Hạn sử dụng phải là hôm nay hoặc một ngày trong tương lai.'
             );
             return;
         }
 
-        if (!Number.isInteger(usageLimit) || usageLimit < 1) {
+        if (
+            !Number.isInteger(usageLimit) ||
+            usageLimit < 1
+        ) {
             setValidationError(
                 'Số lượt sử dụng tối đa phải là số nguyên lớn hơn 0.'
+            );
+            return;
+        }
+
+        if (isEditing && usageLimit < usedCount) {
+            setValidationError(
+                'Số lượt sử dụng tối đa không được nhỏ hơn số lượt đã sử dụng.'
             );
             return;
         }
@@ -108,8 +130,14 @@ const VoucherForm = ({
     return (
         <section className="voucher-form-card">
             <div className="voucher-form-header">
-                <h3>Tạo voucher mới</h3>
-                <p>Nhập thông tin mã giảm giá cho cửa hàng.</p>
+                <h3>
+                    {isEditing ? 'Cập nhật voucher' : 'Tạo voucher mới'}
+                </h3>
+                <p>
+                    {isEditing
+                        ? 'Chỉnh sửa thông tin voucher.'
+                        : 'Nhập thông tin mã giảm giá cho cửa hàng.'}
+                </p>
             </div>
 
             <form onSubmit={handleSubmit}>
@@ -173,7 +201,7 @@ const VoucherForm = ({
                             type="date"
                             value={formData.expiryDate}
                             onChange={handleChange}
-                            min={today}
+                            min={isEditing ? undefined : today}
                             required
                         />
                     </div>
@@ -188,7 +216,7 @@ const VoucherForm = ({
                             type="number"
                             value={formData.usageLimit}
                             onChange={handleChange}
-                            min="1"
+                            min={Math.max(1, usedCount)}
                             step="1"
                             required
                         />
@@ -201,7 +229,9 @@ const VoucherForm = ({
                             checked={formData.isActive}
                             onChange={handleChange}
                         />
-                        Kích hoạt voucher ngay sau khi tạo
+                        {isEditing
+                            ? 'Kích hoạt voucher'
+                            : 'Kích hoạt voucher ngay sau khi tạo'}
                     </label>
                 </div>
 
@@ -230,7 +260,7 @@ const VoucherForm = ({
                         type="submit"
                         className="voucher-submit-button"
                     >
-                        Tạo voucher
+                        {isEditing ? 'Lưu thay đổi' : 'Tạo voucher'}
                     </button>
                 </div>
             </form>

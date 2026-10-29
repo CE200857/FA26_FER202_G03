@@ -5,6 +5,10 @@
 }
 
 .voucher-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
   margin-bottom: 24px;
 }
 
@@ -123,8 +127,17 @@
 }
 
 @media (max-width: 600px) {
+  .voucher-page-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
   .voucher-page-header h2 {
     font-size: 1.3rem;
+  }
+
+  .voucher-create-button {
+    margin-top: 0;
   }
 
   .voucher-toolbar {
@@ -139,6 +152,8 @@
 }
 
 .voucher-create-button {
+  align-self: flex-start;
+  margin-top: 32px;
   padding: 10px 16px;
   border: none;
   border-radius: 6px;
@@ -147,6 +162,7 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .voucher-create-button:hover {
@@ -157,4 +173,19 @@
   margin: 16px 0;
   color: #067647;
   font-size: 14px;
+}
+
+.voucher-edit-button {
+  padding: 6px 12px;
+  border: 1px solid #98618f;
+  border-radius: 5px;
+  color: #804d77;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.voucher-edit-button:hover {
+  background: #f8eff6;
 }
