@@ -189,3 +189,18 @@
 .voucher-edit-button:hover {
   background: #f8eff6;
 }
+
+.voucher-delete-button {
+  padding: 6px 12px;
+  border: 1px solid #b54747;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #b54747;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.voucher-delete-button:hover {
+  background-color: #b54747;
+  color: #fff;
+}
