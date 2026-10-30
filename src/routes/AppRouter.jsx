@@ -1,6 +1,10 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import CustomerLayout from '../layouts/CustomerLayout';
 import AdminLayout from '../layouts/AdminLayout';
+import ProductCatalogPage from '../modules/product-management/pages/ProductCatalogPage';
+import ProductDetailPage from '../modules/product-management/pages/ProductDetailPage';
+import VoucherManagementPage from '../modules/voucher-management/pages/VoucherManagementPage';
+import MyVouchersPage from '../modules/voucher-management/pages/MyVouchersPage';
 
 const PlaceholderPage = ({ title }) => (
   <section style={{ padding: '24px', background: '#fff', borderRadius: '8px' }}>
@@ -15,14 +19,14 @@ const AppRouter = () => {
       {/* Cụm Route dành cho Khách hàng */}
       <Route element={<CustomerLayout />}>
         <Route path="/" element={<PlaceholderPage title="Danh mục Mỹ phẩm Spa & Salon (Product Catalog)" />} />
-        <Route path="/products" element={<PlaceholderPage title="Danh sách Sản phẩm" />} />
-        <Route path="/products/:id" element={<PlaceholderPage title="Chi tiết Sản phẩm" />} />
+        <Route path="/products" element={<ProductCatalogPage />} />
+        <Route path="/products/:id" element={<ProductDetailPage />} />
         <Route path="/login" element={<PlaceholderPage title="Đăng nhập" />} />
         <Route path="/register" element={<PlaceholderPage title="Đăng ký" />} />
         <Route path="/checkout" element={<PlaceholderPage title="Thanh toán Đơn hàng (Checkout)" />} />
         <Route path="/orders/history" element={<PlaceholderPage title="Lịch sử Mua hàng (Order History)" />} />
         <Route path="/profile" element={<PlaceholderPage title="Hồ sơ Cá nhân" />} />
-        <Route path="/vouchers" element={<PlaceholderPage title="Kho Voucher của tôi" />} />
+        <Route path="/vouchers" element={<MyVouchersPage />} />
       </Route>
 
       {/* Cụm Route dành cho Admin / Manager */}
@@ -46,7 +50,7 @@ const AppRouter = () => {
         />
         <Route
           path="vouchers"
-          element={<PlaceholderPage title="Quản lý voucher" />}
+          element={<VoucherManagementPage />}
         />
         <Route
           path="reviews"

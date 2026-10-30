@@ -8,13 +8,13 @@ export const Navigation = ({ layout = "horizontal" }) => {
   const customerLinks = [
     { to: "/", label: "🏠 Trang chủ", public: true },
     { to: "/products", label: "💄 Sản phẩm Spa & Mỹ phẩm", public: true },
-    { to: "/my-vouchers", label: "🎟️ Mã giảm giá", authOnly: true },
-    { to: "/orders", label: "📦 Lịch sử đơn hàng", authOnly: true },
+    { to: "/vouchers", label: "🎟️ Mã giảm giá", authOnly: true },
+    { to: "/orders/history", label: "📦 Lịch sử đơn hàng", authOnly: true },
     { to: "/profile", label: "👤 Hồ sơ cá nhân", authOnly: true },
   ];
 
   const adminLinks = [
-    { to: "/admin/dashboard", label: "📊 Bảng điều khiển (Dashboard)" },
+    { to: "/admin", label: "📊 Bảng điều khiển (Dashboard)" },
     { to: "/admin/products", label: "🧴 Sản phẩm (M1)" },
     { to: "/admin/orders", label: "🧾 Đơn hàng (M2)" },
     { to: "/admin/users", label: "👥 Tài khoản (M3)" },
@@ -101,7 +101,7 @@ export const Navigation = ({ layout = "horizontal" }) => {
             <li key={item.to} style={{ margin: 0 }}>
               <NavLink
                 to={item.to}
-                end={item.to === "/"}
+                end={item.to === "/" || item.to === "/admin"}
                 style={({ isActive }) => ({
                   display: "block",
                   padding: isSidebar ? "10px 14px" : "12px 16px",
