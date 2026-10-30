@@ -1,95 +1,108 @@
 // src/modules/review-management/components/ReviewForm.jsx
-import React, { useState } from 'react';
-import { reviewService } from '../../../services/reviewService';
+import React, { useState, useEffect } from 'react';
 import { validateReview } from '../../../utils/validation';
 
-const ReviewForm = ({ productId, currentUser, onSuccess }) => {
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState('');
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+const ReviewForm = ({ existingReview = null, onSubmit, onCancel }) => {
+  const [rating, setRating] = useState(existingReview ? existingReview.rating : 5);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [comment, setComment] = useState(existingReview ? existingReview.comment : '');
+  const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
+  useEffect(() => {
+    if (existingReview) {
+      setRating(existingReview.rating);
+      setComment(existingReview.comment);
+    }
+  }, [existingReview]);
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError(null);
 
-    // Kiểm tra tính hợp lệ dữ liệu
-    const validationResult = validateReview
-      ? validateReview({ rating, comment })
-      : { isValid: comment.trim().length >= 5, errors: { comment: 'Nhận xét phải có ít nhất 5 ký tự.' } };
+    // Kiểm tra dữ liệu hợp lệ bằng hàm validateReview
+    const { isValid, errors } = validateReview({ rating, comment });
 
-    if (!validationResult.isValid) {
-      setError(validationResult.errors.comment || validationResult.errors.rating || 'Dữ liệu không hợp lệ.');
+    if (!isValid) {
+      setError(errors.comment || errors.rating || 'Dữ liệu không hợp lệ.');
       return;
     }
 
-    try {
-      setLoading(true);
-      const createFn = reviewService?.createReview || reviewService?.addReview;
+    setError('');
+    
+    if (onSubmit) {
+      onSubmit({
+        rating,
+        comment: comment.trim(),
+      });
+    }
 
-      if (typeof createFn === 'function') {
-        await createFn({
-          productId,
-          userId: currentUser?.id,
-          userName: currentUser?.name || currentUser?.userName || 'Khách hàng',
-          rating,
-          comment: comment.trim(),
-        });
-      }
-
+    if (!existingReview) {
       setComment('');
       setRating(5);
-      alert('Đánh giá của bạn đã được gửi thành công!');
-      if (onSuccess) onSuccess();
-    } catch (err) {
-      setError(err.message || 'Có lỗi xảy ra khi gửi đánh giá.');
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <div className="review-form border p-4 rounded-lg bg-white shadow-sm mt-4">
-      <h4 className="font-bold text-lg mb-3 text-gray-800">Viết đánh giá của bạn</h4>
+    <form onSubmit={handleSubmit} className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm mb-6">
+      <h3 className="text-lg font-semibold text-gray-800 mb-3">
+        {existingReview ? 'Chỉnh sửa đánh giá' : 'Viết đánh giá của bạn'}
+      </h3>
 
-      {error && <div className="text-red-500 text-sm mb-3 bg-red-50 p-2 rounded">{error}</div>}
+      {/* Chọn số sao */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">Đánh giá của bạn:</label>
+        <div className="flex items-center space-x-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              onClick={() => setRating(star)}
+              onMouseEnter={() => setHoverRating(star)}
+              onMouseLeave={() => setHoverRating(0)}
+              className="text-2xl focus:outline-none transition-colors"
+            >
+              <span className={(hoverRating || rating) >= star ? 'text-yellow-400' : 'text-gray-300'}>
+                ★
+              </span>
+            </button>
+          ))}
+          <span className="ml-2 text-sm text-gray-600 font-medium">
+            {hoverRating || rating} / 5 sao
+          </span>
+        </div>
+      </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Số sao:</label>
-          <select
-            value={rating}
-            onChange={(e) => setRating(Number(e.target.value))}
-            className="border rounded p-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+      {/* Ô nhập bình luận */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">Nội dung nhận xét:</label>
+        <textarea
+          rows="3"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."
+          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      </div>
+
+      {/* Nút hành động */}
+      <div className="flex justify-end space-x-2">
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition"
           >
-            {[5, 4, 3, 2, 1].map((num) => (
-              <option key={num} value={num}>
-                {num} Sao
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-3">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Nội dung nhận xét:</label>
-          <textarea
-            className="w-full border rounded p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows="3"
-            placeholder="Nhập nhận xét của bạn (ít nhất 5 ký tự)..."
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          ></textarea>
-        </div>
-
+            Hủy
+          </button>
+        )}
         <button
           type="submit"
-          disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition"
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition"
         >
-          {loading ? 'Đang gửi...' : 'Gửi đánh giá'}
+          {existingReview ? 'Cập nhật' : 'Gửi đánh giá'}
         </button>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 };
 
