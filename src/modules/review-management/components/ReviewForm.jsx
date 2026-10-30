@@ -1,3 +1,4 @@
+// src/modules/review-management/components/ReviewForm.jsx
 import React, { useState, useEffect } from 'react';
 import { validateReview } from '../../../utils/validation';
 
@@ -17,7 +18,7 @@ const ReviewForm = ({ existingReview = null, onSubmit, onCancel }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Gọi hàm kiểm tra hợp lệ từ src/utils/validation.js
+    // Kiểm tra dữ liệu hợp lệ bằng hàm validateReview
     const { isValid, errors } = validateReview({ rating, comment });
 
     if (!isValid) {
@@ -26,10 +27,13 @@ const ReviewForm = ({ existingReview = null, onSubmit, onCancel }) => {
     }
 
     setError('');
-    onSubmit({
-      rating,
-      comment: comment.trim(),
-    });
+    
+    if (onSubmit) {
+      onSubmit({
+        rating,
+        comment: comment.trim(),
+      });
+    }
 
     if (!existingReview) {
       setComment('');
