@@ -108,6 +108,31 @@ const VoucherManagementPage = () => {
         }
     };
 
+    const handleDeleteVoucher = (voucher) => {
+        const confirmed = window.confirm(
+            `Bạn có chắc chắn muốn xóa voucher "${voucher.code}" không?`
+        );
+
+        if (!confirmed) return;
+
+        try {
+            voucherService.delete(voucher.id);
+
+            setVouchers(voucherService.getAll());
+            setSuccessMessage(
+                `Đã xóa voucher "${voucher.code}" thành công.`
+            );
+            setError('');
+        } catch (deleteError) {
+            setError(
+                deleteError instanceof Error
+                    ? deleteError.message
+                    : 'Không thể xóa voucher.'
+            );
+            setSuccessMessage('');
+        }
+    };
+
     return (
         <section className="voucher-management">
             <div className="voucher-page-header">
@@ -224,6 +249,13 @@ const VoucherManagementPage = () => {
                                         }
                                     >
                                         Edit
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="voucher-delete-button"
+                                        onClick={() => handleDeleteVoucher(voucher)}
+                                    >
+                                        Delete
                                     </button>
                                 </td>
                             </tr>
