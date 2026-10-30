@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { validateReview } from '../../../utils/validation';
 
 const ReviewForm = ({ existingReview = null, onSubmit, onCancel }) => {
   const [rating, setRating] = useState(existingReview ? existingReview.rating : 5);
@@ -15,12 +16,12 @@ const ReviewForm = ({ existingReview = null, onSubmit, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!comment.trim()) {
-      setError('Vui lòng nhập nội dung đánh giá.');
-      return;
-    }
-    if (comment.trim().length < 5) {
-      setError('Nội dung đánh giá phải ít nhất 5 ký tự.');
+
+    // Gọi hàm kiểm tra hợp lệ từ src/utils/validation.js
+    const { isValid, errors } = validateReview({ rating, comment });
+
+    if (!isValid) {
+      setError(errors.comment || errors.rating || 'Dữ liệu không hợp lệ.');
       return;
     }
 
