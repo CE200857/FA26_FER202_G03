@@ -1,0 +1,46 @@
+/* ===== Cart Drawer ===== */
+.cart-backdrop {
+  position: fixed; inset: 0; z-index: 800;
+  background: rgb(0 0 0 / 40%);
+}
+.cart-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 810;
+  width: min(420px, 100%);
+  display: flex; flex-direction: column;
+  background: #fff; color: #493832;
+  box-shadow: -8px 0 28px rgb(0 0 0 / 18%);
+  animation: cart-slide 0.2s ease-out;
+}
+@keyframes cart-slide { from { transform: translateX(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+.cart-drawer__header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px; border-bottom: 1px solid #eadfd8;
+}
+.cart-drawer__header h2 { margin: 0; font-size: 18px; }
+.cart-icon-btn { border: 0; background: transparent; font-size: 22px; cursor: pointer; color: #8a7a74; }
+.cart-drawer__body { flex: 1; overflow-y: auto; padding: 12px 18px; }
+.cart-drawer__footer { padding: 14px 18px; border-top: 1px solid #eadfd8; display: grid; gap: 10px; }
+.cart-empty { text-align: center; padding: 40px 12px; color: #8a7a74; }
+
+.cart-item { display: grid; grid-template-columns: 64px 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f1e8e2; }
+.cart-item img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; background: #f4ede8; }
+.cart-item__name { font-weight: 600; font-size: 14px; margin: 0 0 4px; }
+.cart-item__price { font-size: 13px; color: #b56576; margin: 0 0 8px; }
+.cart-item__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+
+/* ===== Summary ===== */
+.cart-summary { display: grid; gap: 6px; font-size: 14px; }
+.cart-summary__row { display: flex; justify-content: space-between; }
+.cart-summary__row--discount { color: #198754; }
+.cart-summary__row--total { font-weight: 700; font-size: 17px; border-top: 1px dashed #d9cdc6; padding-top: 8px; margin-top: 4px; }
+
+/* ===== Buttons ===== */
+.co-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 10px 16px; border-radius: 8px; border: 1px solid transparent;
+  font-weight: 600; cursor: pointer; text-decoration: none; font-size: 14px;
+}
+.co-btn--primary { background: #b56576; color: #fff; }
+.co-btn--primary:hover:not(:disabled) { background: #9f5265; }
+.co-btn--ghost { background: #fff; border-color: #d9cdc6; color: #493832; }
+.co-btn:disabled { opacity: 0.5; cursor: not-allowed; }
