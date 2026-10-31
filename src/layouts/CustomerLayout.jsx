@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Outlet, Link, NavLink } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import Footer from '../components/Footer';
+import CartDrawer from '../modules/cart-order/components/CartDrawer'; 
 
 const CustomerLayout = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -44,6 +45,7 @@ const CustomerLayout = () => {
       </main>
 
       <Footer />
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </div>
   );
 };
