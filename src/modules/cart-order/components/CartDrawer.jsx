@@ -1,17 +1,19 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../../context/CartContext';
 import { AuthContext } from '../../../context/AuthContext';
 import { useToast } from '../../../components/common/Toast';
+import ConfirmModal from '../../../components/common/ConfirmModal';
 import { formatCurrency } from '../../../utils/formatCurrency';
 import CartSummary from './CartSummary';
 import '../cart-order.css';
 
 const CartDrawer = ({ isOpen, onClose }) => {
-  const { cartItems, subtotal, updateCartQuantity } = useCart();
+  const { cartItems, subtotal, updateCartQuantity, removeFromCart, clearCart } = useCart();
   const { isAuthenticated } = useContext(AuthContext);
   const toast = useToast();
   const navigate = useNavigate();
+  const [confirmClear, setConfirmClear] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -30,6 +32,17 @@ const CartDrawer = ({ isOpen, onClose }) => {
       return;
     }
     navigate('/checkout');
+  };
+
+  const handleRemove = (item) => {
+    removeFromCart(item.id);
+    toast.info(`Đã xóa "${item.name}" khỏi giỏ hàng.`);
+  };
+
+  const handleClear = () => {
+    clearCart();
+    setConfirmClear(false);
+    toast.info('Đã xóa toàn bộ giỏ hàng.');
   };
 
   return (
@@ -86,6 +99,9 @@ const CartDrawer = ({ isOpen, onClose }) => {
                       </button>
                     </div>
                     <strong>{formatCurrency(item.price * item.quantity)}</strong>
+                    <button type="button" className="link-danger" onClick={() => handleRemove(item)}>
+                      Xóa
+                    </button>
                   </div>
                   {item.quantity >= item.stock && (
                     <p className="cart-note">Đã đạt số lượng tối đa trong kho ({item.stock}).</p>
@@ -102,9 +118,22 @@ const CartDrawer = ({ isOpen, onClose }) => {
             <button type="button" className="co-btn co-btn--primary" onClick={handleCheckout}>
               Thanh toán
             </button>
+            <button type="button" className="co-btn co-btn--ghost" onClick={() => setConfirmClear(true)}>
+              Xóa toàn bộ giỏ hàng
+            </button>
           </div>
         )}
       </aside>
+
+      <ConfirmModal
+        isOpen={confirmClear}
+        title="Xóa toàn bộ giỏ hàng?"
+        message="Tất cả sản phẩm trong giỏ sẽ bị xóa. Bạn có chắc chắn không?"
+        confirmText="Xóa hết"
+        danger
+        onConfirm={handleClear}
+        onCancel={() => setConfirmClear(false)}
+      />
     </>
   );
 };
