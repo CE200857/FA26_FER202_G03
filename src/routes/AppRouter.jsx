@@ -3,6 +3,7 @@ import CustomerLayout from '../layouts/CustomerLayout';
 import AdminLayout from '../layouts/AdminLayout';
 import ProductCatalogPage from '../modules/product-management/pages/ProductCatalogPage';
 import ProductDetailPage from '../modules/product-management/pages/ProductDetailPage';
+import AdminDashboardPage from '../modules/product-management/pages/AdminDashboardPage';
 import VoucherManagementPage from '../modules/voucher-management/pages/VoucherManagementPage';
 import MyVouchersPage from '../modules/voucher-management/pages/MyVouchersPage';
 
@@ -34,7 +35,7 @@ const AppRouter = () => {
       <Route path="/admin" element={<AdminLayout />}>
         <Route
           index
-          element={<PlaceholderPage title="Tổng quan hệ thống" />}
+          element={<AdminDashboardPage />} 
         />
         <Route
           path="products"
