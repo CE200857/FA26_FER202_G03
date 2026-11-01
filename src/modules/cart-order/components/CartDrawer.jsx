@@ -8,7 +8,7 @@ import CartSummary from './CartSummary';
 import '../cart-order.css';
 
 const CartDrawer = ({ isOpen, onClose }) => {
-  const { cartItems, subtotal } = useCart();
+  const { cartItems, subtotal, updateCartQuantity } = useCart();
   const { isAuthenticated } = useContext(AuthContext);
   const toast = useToast();
   const navigate = useNavigate();
@@ -66,9 +66,30 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   <p className="cart-item__name">{item.name}</p>
                   <p className="cart-item__price">{formatCurrency(item.price)}</p>
                   <div className="cart-item__row">
-                    <span>Số lượng: {item.quantity}</span>
+                    <div className="qty-control">
+                      <button
+                        type="button"
+                        onClick={() => updateCartQuantity(item.id, item.quantity - 1)}
+                        disabled={item.quantity <= 1}
+                        aria-label="Giảm số lượng"
+                      >
+                        −
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button
+                        type="button"
+                        onClick={() => updateCartQuantity(item.id, item.quantity + 1)}
+                        disabled={item.quantity >= item.stock}
+                        aria-label="Tăng số lượng"
+                      >
+                        +
+                      </button>
+                    </div>
                     <strong>{formatCurrency(item.price * item.quantity)}</strong>
                   </div>
+                  {item.quantity >= item.stock && (
+                    <p className="cart-note">Đã đạt số lượng tối đa trong kho ({item.stock}).</p>
+                  )}
                 </div>
               </div>
             ))
