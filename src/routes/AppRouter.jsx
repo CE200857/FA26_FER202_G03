@@ -4,6 +4,9 @@ import AdminLayout from '../layouts/AdminLayout';
 import ProductCatalogPage from '../modules/product-management/pages/ProductCatalogPage';
 import ProductDetailPage from '../modules/product-management/pages/ProductDetailPage';
 import AdminDashboardPage from '../modules/product-management/pages/AdminDashboardPage';
+import VoucherManagementPage from '../modules/voucher-management/pages/VoucherManagementPage';
+import MyVouchersPage from '../modules/voucher-management/pages/MyVouchersPage';
+
 const PlaceholderPage = ({ title }) => (
   <section style={{ padding: '24px', background: '#fff', borderRadius: '8px' }}>
     <h2>{title}</h2>
@@ -24,7 +27,7 @@ const AppRouter = () => {
         <Route path="/checkout" element={<PlaceholderPage title="Thanh toán Đơn hàng (Checkout)" />} />
         <Route path="/orders/history" element={<PlaceholderPage title="Lịch sử Mua hàng (Order History)" />} />
         <Route path="/profile" element={<PlaceholderPage title="Hồ sơ Cá nhân" />} />
-        <Route path="/vouchers" element={<PlaceholderPage title="Kho Voucher của tôi" />} />
+        <Route path="/vouchers" element={<MyVouchersPage />} />
       </Route>
 
       {/* Cụm Route dành cho Admin / Manager */}
@@ -48,7 +51,7 @@ const AppRouter = () => {
         />
         <Route
           path="vouchers"
-          element={<PlaceholderPage title="Quản lý voucher" />}
+          element={<VoucherManagementPage />}
         />
         <Route
           path="reviews"
