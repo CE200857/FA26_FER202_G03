@@ -56,3 +56,6 @@
 .qty-control button:disabled { opacity: 0.4; cursor: not-allowed; }
 .qty-control span { min-width: 32px; text-align: center; font-size: 14px; }
 .cart-note { font-size: 12px; color: #a0643a; margin: 4px 0 0; }
+
+/* ===== Remove (remove-from-cart) ===== */
+.link-danger { border: 0; background: transparent; color: #dc3545; cursor: pointer; font-size: 13px; }
