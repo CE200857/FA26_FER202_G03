@@ -469,3 +469,161 @@
     flex: 1 1 calc(50% - 6px);
   }
 }
+
+
+.pm-dash {
+  display: grid;
+  gap: 32px;
+}
+
+.pm-dash__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pm-dash__heading h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.pm-dash__heading a {
+  color: var(--color-primary-hover);
+  font-weight: 600;
+}
+
+.pm-dash__heading a:hover {
+  text-decoration: underline;
+}
+
+.pm-dash h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+}
+
+.pm-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin: 0 0 16px;
+}
+
+.pm-stat {
+  padding: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.pm-stat dt {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.pm-stat dd {
+  margin: 4px 0 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.pm-stat p {
+  margin: 4px 0 0;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.pm-dash__split {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.pm-bars {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pm-bars li {
+  display: grid;
+  grid-template-columns: 90px 1fr 32px;
+  align-items: center;
+  gap: 10px;
+}
+
+.pm-bars__label {
+  font-size: 0.9rem;
+}
+
+.pm-bars__track {
+  height: 10px;
+  overflow: hidden;
+  background: var(--color-border);
+  border-radius: 999px;
+}
+
+.pm-bars__fill {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  border-radius: 999px;
+  background: var(--color-primary-hover);
+}
+
+.pm-bars__fill--completed {
+  background: #2f7a53;
+}
+
+.pm-bars__fill--cancelled {
+  background: #a3342b;
+}
+
+.pm-bars__fill--pending {
+  background: #b98a2e;
+}
+
+.pm-bars__fill--shipping {
+  background: #3d6fa3;
+}
+
+.pm-bars__count {
+  text-align: right;
+  font-weight: 600;
+}
+
+.pm-table--compact {
+  min-width: 0;
+}
+
+.pm-badge--pending {
+  background: #f6ecd9;
+  color: #6f4b00;
+}
+
+.pm-badge--shipping {
+  background: #e1ebf5;
+  color: #1f4a72;
+}
+
+.pm-badge--completed {
+  background: #e3f1ea;
+  color: #1d5a3b;
+}
+
+.pm-badge--cancelled {
+  background: #f8e5e3;
+  color: #8f2d25;
+}
+
+@media (max-width: 720px) {
+  .pm-dash__split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

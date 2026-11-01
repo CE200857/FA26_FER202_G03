@@ -3,7 +3,7 @@ import CustomerLayout from '../layouts/CustomerLayout';
 import AdminLayout from '../layouts/AdminLayout';
 import ProductCatalogPage from '../modules/product-management/pages/ProductCatalogPage';
 import ProductDetailPage from '../modules/product-management/pages/ProductDetailPage';
-
+import AdminDashboardPage from '../modules/product-management/pages/AdminDashboardPage';
 const PlaceholderPage = ({ title }) => (
   <section style={{ padding: '24px', background: '#fff', borderRadius: '8px' }}>
     <h2>{title}</h2>
@@ -32,7 +32,7 @@ const AppRouter = () => {
       <Route path="/admin" element={<AdminLayout />}>
         <Route
           index
-          element={<PlaceholderPage title="Tổng quan hệ thống" />}
+          element={<AdminDashboardPage />} 
         />
         <Route
           path="products"
