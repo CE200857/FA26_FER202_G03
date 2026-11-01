@@ -125,3 +125,38 @@ export const isNotEmpty = (value) => {
   if (typeof value === 'string') return value.trim().length > 0;
   return true;
 };
+
+export const validateUserForm = (
+  { name, email, password, phone, role },
+  isEdit = false,
+) => {
+  const errors = {};
+
+  if (!name.trim()) {
+    errors.name = "Vui lòng nhập họ tên";
+  }
+
+  if (!isEdit) {
+    if (!email.trim()) {
+      errors.email = "Vui lòng nhập email";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      errors.email = "Email không hợp lệ";
+    }
+
+    if (!password) {
+      errors.password = "Vui lòng nhập mật khẩu";
+    } else if (password.length < 6) {
+      errors.password = "Mật khẩu phải có ít nhất 6 ký tự";
+    }
+  }
+
+  if (phone.trim() && !/^0\d{9}$/.test(phone.trim())) {
+    errors.phone = "Số điện thoại phải gồm 10 chữ số, bắt đầu bằng 0";
+  }
+
+  if (!["Admin", "Customer"].includes(role)) {
+    errors.role = "Vai trò không hợp lệ";
+  }
+
+  return errors;
+};
