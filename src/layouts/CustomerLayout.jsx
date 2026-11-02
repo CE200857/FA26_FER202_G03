@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import Header from '../components/Header';
-import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import CartDrawer from '../modules/cart-order/components/CartDrawer';
 
@@ -16,7 +15,6 @@ const CustomerLayout = () => {
         onOpenCart={() => setIsCartOpen((previous) => !previous)}
         cartItemCount={totalItems}
       />
-      <Navigation />
 
       <main className="site-main container">
         <Outlet context={{ isCartOpen, setIsCartOpen }} />
