@@ -1,4 +1,6 @@
-import { Outlet, NavLink, Link, useLocation } from 'react-router-dom';
+import { useContext } from 'react';
+import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import Footer from '../components/Footer';
 
 const pageTitles = {
@@ -12,7 +14,14 @@ const pageTitles = {
 
 const AdminLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useContext(AuthContext);
   const pageTitle = pageTitles[location.pathname] || 'Hệ thống quản trị';
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <div className="app-shell admin-layout">
@@ -56,9 +65,19 @@ const AdminLayout = () => {
               <h1>{pageTitle}</h1>
             </div>
 
-            <Link to="/" className="back-to-store">
-              ← Về cửa hàng
-            </Link>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <Link to="/" className="back-to-store">
+                ← Về cửa hàng
+              </Link>
+              <button
+                type="button"
+                className="back-to-store"
+                onClick={handleLogout}
+                style={{ background: 'transparent', cursor: 'pointer' }}
+              >
+                Đăng xuất
+              </button>
+            </div>
           </header>
 
           <main className="admin-main">

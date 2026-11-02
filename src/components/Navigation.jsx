@@ -6,20 +6,18 @@ export const Navigation = ({ layout = "horizontal" }) => {
   const { isAuthenticated, isAdmin } = useContext(AuthContext);
 
   const customerLinks = [
-    { to: "/", label: "🏠 Trang chủ", public: true },
     { to: "/products", label: "💄 Sản phẩm Spa & Mỹ phẩm", public: true },
     { to: "/vouchers", label: "🎟️ Mã giảm giá", authOnly: true },
     { to: "/orders/history", label: "📦 Lịch sử đơn hàng", authOnly: true },
-    { to: "/profile", label: "👤 Hồ sơ cá nhân", authOnly: true },
   ];
 
   const adminLinks = [
     { to: "/admin", label: "📊 Bảng điều khiển (Dashboard)" },
-    { to: "/admin/products", label: "🧴 Sản phẩm (M1)" },
-    { to: "/admin/orders", label: "🧾 Đơn hàng (M2)" },
-    { to: "/admin/users", label: "👥 Tài khoản (M3)" },
-    { to: "/admin/vouchers", label: "🏷️ Voucher (M4)" },
-    { to: "/admin/reviews", label: "⭐ Kiểm duyệt Đánh giá (M5)" },
+    { to: "/admin/products", label: "🧴 Sản phẩm" },
+    { to: "/admin/orders", label: "🧾 Đơn hàng" },
+    { to: "/admin/users", label: "👥 Tài khoản" },
+    { to: "/admin/vouchers", label: "🏷️ Voucher" },
+    { to: "/admin/reviews", label: "⭐ Kiểm duyệt Đánh giá" },
     { to: "/products", label: "🛍️ Xem giao diện Cửa hàng" },
   ];
 
@@ -43,8 +41,9 @@ export const Navigation = ({ layout = "horizontal" }) => {
               color: "#ffffff",
             }
           : {
+              width: "100%",
               backgroundColor: "#355070",
-              padding: "0 24px",
+              padding: "0 28px",
             }
       }
     >
@@ -57,8 +56,7 @@ export const Navigation = ({ layout = "horizontal" }) => {
                 gap: "12px",
               }
             : {
-                maxWidth: "1200px",
-                margin: "0 auto",
+                width: "100%",
               }
         }
       >
