@@ -14,9 +14,10 @@ export const Header = ({ onOpenCart, cartItemCount = 0 }) => {
   return (
     <header
       style={{
+        width: "100%",
         backgroundColor: "#ffffff",
         borderBottom: "1px solid #eaeaea",
-        padding: "12px 24px",
+        padding: "12px 28px",
         position: "sticky",
         top: 0,
         zIndex: 100,
@@ -25,8 +26,7 @@ export const Header = ({ onOpenCart, cartItemCount = 0 }) => {
     >
       <div
         style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
+          width: "100%",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
@@ -44,7 +44,6 @@ export const Header = ({ onOpenCart, cartItemCount = 0 }) => {
             color: "#2c3e50",
           }}
         >
-          <span style={{ fontSize: "28px" }}>✨</span>
           <div>
             <div
               style={{
@@ -54,7 +53,7 @@ export const Header = ({ onOpenCart, cartItemCount = 0 }) => {
                 color: "#b56576",
               }}
             >
-              LUMIÈRE SPA & SALON
+              SPA & SALON COSMETICS RETAIL
             </div>
             <div style={{ fontSize: "12px", color: "#6c757d" }}>
               Cosmetics Retail System
@@ -66,6 +65,7 @@ export const Header = ({ onOpenCart, cartItemCount = 0 }) => {
           style={{
             display: "flex",
             alignItems: "center",
+            flexWrap: "wrap",
             gap: "16px",
           }}
         >

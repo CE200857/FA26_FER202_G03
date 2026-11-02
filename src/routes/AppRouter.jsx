@@ -1,62 +1,55 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import CustomerLayout from '../layouts/CustomerLayout';
 import AdminLayout from '../layouts/AdminLayout';
+import ProtectedRoute from './ProtectedRoute';
 import ProductCatalogPage from '../modules/product-management/pages/ProductCatalogPage';
 import ProductDetailPage from '../modules/product-management/pages/ProductDetailPage';
 import AdminDashboardPage from '../modules/product-management/pages/AdminDashboardPage';
+import LoginPage from '../modules/account-management/pages/LoginPage';
+import RegisterPage from '../modules/account-management/pages/RegisterPage';
+import UserProfilePage from '../modules/account-management/pages/UserProfilePage';
+import UserManagement from '../modules/account-management/components/UserManagement';
 import VoucherManagementPage from '../modules/voucher-management/pages/VoucherManagementPage';
 import MyVouchersPage from '../modules/voucher-management/pages/MyVouchersPage';
+import ReviewManagementPage from '../modules/review-management/pages/ReviewManagementPage';
 
 const PlaceholderPage = ({ title }) => (
   <section style={{ padding: '24px', background: '#fff', borderRadius: '8px' }}>
     <h2>{title}</h2>
-    <p>Trang thuộc khung định tuyến Tuần 1 (Group 3).</p>
+    <p>Chức năng này sẽ hoàn thiện ở tuần sau.</p>
   </section>
 );
 
 const AppRouter = () => {
   return (
     <Routes>
-      {/* Cụm Route dành cho Khách hàng */}
       <Route element={<CustomerLayout />}>
-        <Route path="/" element={<PlaceholderPage title="Danh mục Mỹ phẩm Spa & Salon (Product Catalog)" />} />
+        <Route path="/" element={<ProductCatalogPage />} />
         <Route path="/products" element={<ProductCatalogPage />} />
         <Route path="/products/:id" element={<ProductDetailPage />} />
-        <Route path="/login" element={<PlaceholderPage title="Đăng nhập" />} />
-        <Route path="/register" element={<PlaceholderPage title="Đăng ký" />} />
-        <Route path="/checkout" element={<PlaceholderPage title="Thanh toán Đơn hàng (Checkout)" />} />
-        <Route path="/orders/history" element={<PlaceholderPage title="Lịch sử Mua hàng (Order History)" />} />
-        <Route path="/profile" element={<PlaceholderPage title="Hồ sơ Cá nhân" />} />
-        <Route path="/vouchers" element={<MyVouchersPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/profile" element={<UserProfilePage />} />
+        </Route>
+
+        <Route element={<ProtectedRoute allowedRoles={['Customer']} />}>
+          <Route path="/checkout" element={<PlaceholderPage title="Thanh toán Đơn hàng (Checkout)" />} />
+          <Route path="/orders/history" element={<PlaceholderPage title="Lịch sử Mua hàng (Order History)" />} />
+          <Route path="/vouchers" element={<MyVouchersPage />} />
+        </Route>
       </Route>
 
-      {/* Cụm Route dành cho Admin / Manager */}
-
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route
-          index
-          element={<AdminDashboardPage />} 
-        />
-        <Route
-          path="products"
-          element={<PlaceholderPage title="Quản lý sản phẩm" />}
-        />
-        <Route
-          path="orders"
-          element={<PlaceholderPage title="Quản lý đơn hàng" />}
-        />
-        <Route
-          path="users"
-          element={<PlaceholderPage title="Quản lý tài khoản" />}
-        />
-        <Route
-          path="vouchers"
-          element={<VoucherManagementPage />}
-        />
-        <Route
-          path="reviews"
-          element={<PlaceholderPage title="Quản lý đánh giá" />}
-        />
+      <Route element={<ProtectedRoute allowedRoles={['Admin']} />}>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboardPage />} />
+          <Route path="products" element={<PlaceholderPage title="Quản lý sản phẩm" />} />
+          <Route path="orders" element={<PlaceholderPage title="Quản lý đơn hàng" />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route path="vouchers" element={<VoucherManagementPage />} />
+          <Route path="reviews" element={<ReviewManagementPage />} />
+        </Route>
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
