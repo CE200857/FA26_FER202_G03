@@ -2,11 +2,38 @@ import { STORAGE_KEYS, storageService } from "./storageService";
 import { initialUsers } from "../data/mockData";
 
 const getUsers = () => {
-  const users = storageService.get(STORAGE_KEYS.USERS, []);
-  if (users.length === 0) {
-    storageService.set(STORAGE_KEYS.USERS, initialUsers);
-    return initialUsers;
+  let users = storageService.get(STORAGE_KEYS.USERS, []);
+  let needSave = false;
+
+  if(users.length === 0){
+    users = initialUsers.map((user) => ({...users}));
+    needSave = true;
   }
+
+  users.forEach((user) => {
+    if(
+      user.status === undefined || 
+      user.status === null || 
+      user.status === ""
+    ) {
+      const initialUsers = initialUsers.find(
+        (item) => item.email === user.email
+      );
+
+      user.status = initialUsers ? initialUsers.status : "active";
+
+      needSave = true;
+    }
+  });
+
+  if(needSave) {
+    const saved = storageService.set(STORAGE_KEYS.USERS, users);
+
+    if(!saved){
+      throw new Error("Cannot update account database, Please check localStorage");
+    }
+  }
+
   return users;
 };
 
