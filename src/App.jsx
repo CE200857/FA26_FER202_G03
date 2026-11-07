@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './components/common/Toast';
 import { initializeMockDatabase } from './data/mockData';
 import AppRouter from './routes/AppRouter';
+import "bootstrap/dist/css/bootstrap.min.css";
 import './App.css';
 
 function App() {

@@ -16,11 +16,11 @@ const getUsers = () => {
       user.status === null || 
       user.status === ""
     ) {
-      const initialUsers = initialUsers.find(
+      const initialUser = initialUsers.find(
         (item) => item.email === user.email
       );
 
-      user.status = initialUsers ? initialUsers.status : "active";
+      user.status = initialUser ? initialUser.status : "active";
 
       needSave = true;
     }

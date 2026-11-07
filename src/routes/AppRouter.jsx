@@ -7,7 +7,9 @@ import ProductDetailPage from '../modules/product-management/pages/ProductDetail
 import AdminDashboardPage from '../modules/product-management/pages/AdminDashboardPage';
 import LoginPage from '../modules/account-management/pages/LoginPage';
 import RegisterPage from '../modules/account-management/pages/RegisterPage';
-import UserProfilePage from '../modules/account-management/pages/UserProfilePage';
+import UserProfilePage from "../modules/account-management/pages/UserPageProfile";
+import UpdateProfilePage from "../modules/account-management/pages/UpdateProfilePage";
+import ChangePasswordPage from "../modules/account-management/pages/ChangePasswordPage";
 import UserManagement from '../modules/account-management/components/UserManagement';
 import VoucherManagementPage from '../modules/voucher-management/pages/VoucherManagementPage';
 import MyVouchersPage from '../modules/voucher-management/pages/MyVouchersPage';
@@ -32,6 +34,8 @@ const AppRouter = () => {
 
         <Route element={<ProtectedRoute />}>
           <Route path="/profile" element={<UserProfilePage />} />
+          <Route path="/profile/update" element={<UpdateProfilePage />} />
+          <Route path="/profile/change-password" element={<ChangePasswordPage />} />
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={['Customer']} />}>
