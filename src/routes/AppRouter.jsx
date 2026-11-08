@@ -20,7 +20,7 @@ import OrderHistoryPage from '../modules/cart-order/pages/OrderHistoryPage';
 import CheckoutPage from '../modules/cart-order/pages/CheckoutPage';
 import OrderManagement from '../modules/cart-order/components/OrderManagement';
 import ProductReviewPage from "../modules/review-management/pages/ProductReviewPage";
-
+import ProductManagementPage from '../modules/product-management/pages/ProductManagementPage';
 const PlaceholderPage = ({ title }) => (
     <section style={{ padding: '24px', background: '#fff', borderRadius: '8px' }}>
         <h2>{title}</h2>
@@ -59,11 +59,11 @@ const AppRouter = () => {
             <Route element={<ProtectedRoute allowedRoles={['Admin']} />}>
                 <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<AdminDashboardPage />} />
-                    <Route path="products" element={<PlaceholderPage title="Quản lý sản phẩm" />} />
                     <Route path="orders" element={<OrderManagement />} />
                     <Route path="users" element={<UserManagement />} />
                     <Route path="vouchers" element={<VoucherManagementPage />} />
                     <Route path="reviews" element={<ReviewManagementPage />} />
+                    <Route path="products" element={<ProductManagementPage />}/>
                 </Route>
             </Route>
 
