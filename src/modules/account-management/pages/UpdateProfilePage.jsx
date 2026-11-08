@@ -3,6 +3,7 @@ import { Container, Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
 import { userService } from "../../../services/userService";
+import { validateProfile } from "../../../utils/validation";
 
 const UpdateProfilePage = () => {
   const { user, updateUser } = useContext(AuthContext);
@@ -35,8 +36,9 @@ const UpdateProfilePage = () => {
       });
   }, [user]);
 
-  const validName = name.trim() !== "";
-  const validPhone = phone.trim() === "" || /^0\d{9}$/.test(phone.trim());
+  const profileErrors = validateProfile({name, phone});
+  const validName = !profileErrors.name;
+  const validPhone = !profileErrors.phone;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -106,7 +108,7 @@ const UpdateProfilePage = () => {
             isValid={submit && validName}
           />
           <Form.Control.Feedback type="invalid">
-            Vui lòng nhập họ tên.
+            {profileErrors.name}
           </Form.Control.Feedback>
         </Form.Group>
         <Form.Group className="mb-3" controlId="profilePhone">
@@ -121,7 +123,7 @@ const UpdateProfilePage = () => {
             autoComplete="tel"
           />
           <Form.Control.Feedback type="invalid">
-            Số điện thoại phải gồm 10 chữ số, bắt đầu bằng 0.
+            {profileErrors.phone}
           </Form.Control.Feedback>
         </Form.Group>
 
