@@ -4,6 +4,38 @@ const api = axios.create({ baseURL: 'http://localhost:5001', timeout: 10000 });
 
 export const orderService = {
 
+        async cancelOrder(orderId, userId) {
+        const id = String(orderId ?? '').trim();
+        const ownerId = String(userId ?? '').trim();
+        if (!ownerId) {
+            throw new Error('Vui lòng đăng nhập để hủy đơn hàng.');
+        }
+        if (!id) {
+            throw new Error('Mã đơn hàng không hợp lệ.');
+        }
+        const endpoint = `/orders/${encodeURIComponent(id)}`;
+        try {
+            const response = await api.get(endpoint);
+            const order = response.data;
+            if (!order || typeof order !== 'object' || Array.isArray(order)) {
+                throw new Error('Dữ liệu đơn hàng không hợp lệ.');
+            }
+            if (String(order.userId ?? '') !== ownerId) {
+                throw new Error('Bạn không có quyền hủy đơn hàng này.');
+            }
+            if (order.status !== 'Pending') {
+                throw new Error('Chỉ có thể hủy đơn hàng đang chờ xác nhận. Vui lòng tải lại danh sách.');
+            }
+            const updatedResponse = await api.patch(endpoint, { status: 'Cancelled' });
+            return updatedResponse.data;
+        } catch (error) {
+            if (error.response?.status === 404) {
+                throw new Error('Không tìm thấy đơn hàng.');
+            }
+            throw error;
+        }
+    },
+
     async getAllOrders() {
         const response = await api.get('/orders');
         const orders = response.data;
