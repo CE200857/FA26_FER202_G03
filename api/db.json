@@ -77,7 +77,16 @@
     },
     {
       "userId": "YMQ41EPDT7o",
-      "items": [],
+      "items": [
+        {
+          "id": "P001",
+          "name": "Tinh chất dưỡng trắng Vitamin C Spa",
+          "price": 450000,
+          "image": "https://placehold.co/300x300?text=Serum+Vitamin+C",
+          "stock": 25,
+          "quantity": 1
+        }
+      ],
       "id": "sxDW4q4Fs1c"
     }
   ],

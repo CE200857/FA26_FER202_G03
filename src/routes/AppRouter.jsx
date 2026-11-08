@@ -17,6 +17,7 @@ import VoucherManagementPage from '../modules/voucher-management/pages/VoucherMa
 import MyVouchersPage from '../modules/voucher-management/pages/MyVouchersPage';
 import ReviewManagementPage from '../modules/review-management/pages/ReviewManagementPage';
 import OrderHistoryPage from '../modules/cart-order/pages/OrderHistoryPage';
+import CheckoutPage from '../modules/cart-order/pages/CheckoutPage';
 
 const PlaceholderPage = ({ title }) => (
     <section style={{ padding: '24px', background: '#fff', borderRadius: '8px' }}>
@@ -38,7 +39,7 @@ const AppRouter = () => {
                 <Route path="/register" element={<RegisterPage />} />
 
                 <Route element={<ProtectedRoute allowedRoles={['Customer']} />}>
-                    <Route path="/checkout" element={<PlaceholderPage title="Thanh toán Đơn hàng (Checkout)" />} />
+                    <Route path="/checkout" element={<CheckoutPage />} />
                     <Route path="/orders/history" element={<OrderHistoryPage />} />
                     <Route path="/vouchers" element={<MyVouchersPage />} />
                 </Route>
