@@ -25,7 +25,7 @@ export const authService = {
   login: async (email, password) => {
     const users = await getUsersByEmail(email);
 
-    const user = user.find((u) => u.password === password);
+    const user = users.find((u) => u.password === password);
 
     if (!user) {
       throw new Error("Email hoặc mật khẩu không chính xác!");
