@@ -28,11 +28,11 @@ const UserManagement = () => {
     setUsers(userService.getAllUsers());
   };
 
-  const filteredUsers = user.filter((item) => {
+  const filteredUsers = users.filter((item) => {
     const keyword = searchTerm.trim().toLowerCase();
 
     const matchesSearch =
-      item.name.toLowerCase().icludes(keyword) ||
+      item.name.toLowerCase().includes(keyword) ||
       item.email.toLowerCase().includes(keyword);
 
     const matchesStatus =
