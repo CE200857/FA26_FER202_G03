@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, use } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Container, Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
@@ -14,31 +14,25 @@ const UpdateProfilePage = () => {
   const [submit, setSubmit] = useState(false);
 
   useEffect(() => {
-    let ignore = false;
-    const loadProfile = async () => {
-      try {
-        const data = user ? await userService.getUserById(user.id) : null;
-        if (!ignore) {
-          setProfile(data);
-          setName(data ? String(data.name || "") : "");
-          setPhone(data ? String(data.phone || "") : "");
-        }
-      } catch (error) {
-        if (!ignore) {
-          alert(error.message);
-        }
-      } finally {
-        if (!ignore) {
-          setLoading(false);
-        }
-      }
-    };
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-    loadProfile();
-
-    return () => {
-      ignore = true;
-    };
+    userService
+      .getUserById(user.id)
+      .then((data) => {
+        setProfile(data);
+        if (data) {
+          setName(data.name);
+          setPhone(data.phone);
+        }
+        setLoading(false);
+      })
+      .catch((error) => {
+        alert(error.message);
+        setLoading(false);
+      });
   }, [user]);
 
   const validName = name.trim() !== "";

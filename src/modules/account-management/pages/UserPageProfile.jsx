@@ -12,30 +12,21 @@ const UserProfilePage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let ignore = false;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-    const loadProfile = async () => {
-      try {
-        const data = user ? await userService.getUserById(user.id) : null;
-        if (!ignore) {
-          setProfile(data);
-        }
-      } catch (error) {
-        if (!ignore) {
-          alert(error.message);
-        }
-      } finally {
-        if (!ignore) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadProfile();
-
-    return () => {
-      ignore = true;
-    };
+    userService
+      .getUserById(user.id)
+      .then((data) => {
+        setProfile(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        alert(error.message);
+        setLoading(false);
+      });
   }, [user]);
 
   if (loading) {
