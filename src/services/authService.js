@@ -1,73 +1,67 @@
-import { STORAGE_KEYS, storageService } from "./storageService";
+import axios from 'axios';
+import { STORAGE_KEYS, storageService } from './storageService';
 
-const API_URL = "http://localhost:5001";
+const API_URL = 'http://localhost:5001';
+const toUserInfo = (user) => ({ id: user.id, name: user.name, email: user.email, role: user.role });
 
-const toUserInfo = (user) => ({
-  id: user.id,
-  name: user.name,
-  email: user.email,
-  role: user.role,
-});
+const getUsersByEmail = async (email) => {
+    let response;
+    try {
+        response = await axios.get(`${API_URL}/users`, { params: { email } });
+    } catch {
+        throw new Error('Không thể tải tài khoản. Kiểm tra json-server ở cổng 5001.');
+    }
+    if (!Array.isArray(response.data)) {
+        throw new Error('Dữ liệu tài khoản không hợp lệ.');
+    }
+    return response.data;
+};
 
 export const authService = {
-  login: (email, password) => {
-    return fetch(`${API_URL}/users?email=${email}`)
-      .then((res) => res.json())
-      .then((users) => {
+    login: async (email, password) => {
+        const users = await getUsersByEmail(email);
         const user = users.find((u) => u.password === password);
-
         if (!user) {
-          throw new Error("Email hoặc mật khẩu không chính xác!");
+            throw new Error('Email hoặc mật khẩu không chính xác!');
         }
-        if (user.status !== "active") {
-          throw new Error("Tài khoản của bạn đã bị khóa bởi quản trị viên!");
+        if (user.status !== 'active') {
+            throw new Error('Tài khoản của bạn đã bị khóa bởi quản trị viên!');
         }
-
         const userInfo = toUserInfo(user);
         storageService.set(STORAGE_KEYS.CURRENT_USER, userInfo);
-
         return userInfo;
-      });
-  },
+    },
 
-  register: (userData) => {
-    return fetch(`${API_URL}/users?email=${userData.email}`)
-      .then((res) => res.json())
-      .then((users) => {
+    register: async (userData) => {
+        const users = await getUsersByEmail(userData.email);
         if (users.length > 0) {
-          throw new Error("Email này đã được sử dụng!");
+            throw new Error('Email này đã được sử dụng!');
         }
-
         const newUser = {
-          id: "U" + new Date().getTime(),
-          name: userData.name,
-          email: userData.email,
-          password: userData.password,
-          phone: "",
-          role: "Customer",
-          status: "active",
+            name: userData.name,
+            email: userData.email,
+            password: userData.password,
+            phone: '',
+            role: 'Customer',
+            status: 'active',
         };
-
-        return fetch(`${API_URL}/users`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newUser),
-        });
-      })
-      .then((res) => res.json())
-      .then((createdUser) => {
+        let createdUser;
+        try {
+            const response = await axios.post(`${API_URL}/users`, newUser);
+            createdUser = response.data;
+        } catch {
+            throw new Error('Không thể đăng ký tài khoản. Kiểm tra json-server ở cổng 5001.');
+        }
         const userInfo = toUserInfo(createdUser);
         storageService.set(STORAGE_KEYS.CURRENT_USER, userInfo);
-
         return userInfo;
-      });
-  },
+    },
 
-  logout: () => {
-    storageService.remove(STORAGE_KEYS.CURRENT_USER);
-  },
+    logout: () => {
+        storageService.remove(STORAGE_KEYS.CURRENT_USER);
+    },
 
-  getCurrentUser: () => {
-    return storageService.get(STORAGE_KEYS.CURRENT_USER, null);
-  },
+    getCurrentUser: () => {
+        return storageService.get(STORAGE_KEYS.CURRENT_USER, null);
+    },
 };

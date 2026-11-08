@@ -40,7 +40,7 @@ export const ToastProvider = ({ children }) => {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`toast toast--${toast.type}`}
+            className={`toast show toast--${toast.type}`}
             role={toast.type === 'error' ? 'alert' : 'status'}
           >
             <span className="toast-message">{toast.message}</span>
