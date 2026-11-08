@@ -61,9 +61,15 @@ const CheckoutPage = () => {
                 recipientName: form.recipientName,
                 phone: form.phone,
                 shippingAddress: form.shippingAddress,
+                expectedItems: cartItems.map((item) => ({ id: item.id, price: item.price, quantity: item.quantity })),
             });
         } catch (requestError) {
             if (ownerSession !== session.current) return;
+
+            if (requestError.code === 'CART_CHANGED') {
+                await reloadCart();
+                if (ownerSession !== session.current) return;
+            }
 
             const uncertainResult = requestError.config?.method?.toLowerCase() === 'post' &&
                 (

@@ -86,16 +86,7 @@
     },
     {
       "userId": "YMQ41EPDT7o",
-      "items": [
-        {
-          "id": "P001",
-          "name": "Tinh chất dưỡng trắng Vitamin C Spa",
-          "price": 450000,
-          "image": "https://placehold.co/300x300?text=Serum+Vitamin+C",
-          "stock": 25,
-          "quantity": 1
-        }
-      ],
+      "items": [],
       "id": "sxDW4q4Fs1c"
     }
   ],
@@ -145,6 +136,33 @@
       "status": "Completed",
       "createdAt": "2026-11-08T14:19:53.182Z",
       "id": "vUfzSrMgnmc"
+    },
+    {
+      "userId": "YMQ41EPDT7o",
+      "recipientName": "Thành Đạt Trần",
+      "phone": "0993456789",
+      "shippingAddress": "gầ",
+      "items": [
+        {
+          "productId": "P001",
+          "name": "Tinh chất dưỡng trắng Vitamin C Spa",
+          "price": 450000,
+          "quantity": 2
+        },
+        {
+          "productId": "P002",
+          "name": "Dầu gội phục hồi tóc hư tổn Salon Pro",
+          "price": 380000,
+          "quantity": 1
+        }
+      ],
+      "subtotal": 1280000,
+      "discountAmount": 0,
+      "totalAmount": 1280000,
+      "voucherCode": null,
+      "status": "Cancelled",
+      "createdAt": "2026-11-08T15:50:59.470Z",
+      "id": "0NBh5HOzLRc"
     }
   ],
   "vouchers": [

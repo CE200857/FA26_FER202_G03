@@ -4,7 +4,7 @@ const api = axios.create({ baseURL: 'http://localhost:5001', timeout: 10000 });
 
 export const orderService = {
 
-        async cancelOrder(orderId, userId) {
+    async cancelOrder(orderId, userId) {
         const id = String(orderId ?? '').trim();
         const ownerId = String(userId ?? '').trim();
         if (!ownerId) {
@@ -98,7 +98,7 @@ export const orderService = {
         });
     },
 
-    async createOrder({ userId, recipientName, phone, shippingAddress }) {
+    async createOrder({ userId, recipientName, phone, shippingAddress, expectedItems }) {
         const ownerId = String(userId ?? '').trim();
         const receiver = String(recipientName ?? '').trim();
         const address = String(shippingAddress ?? '').trim();
@@ -125,8 +125,18 @@ export const orderService = {
         if (!Array.isArray(cart.items)) {
             throw new Error('Dữ liệu giỏ hàng không hợp lệ.');
         }
-        if (cart.items.length === 0) {
-            throw new Error('Giỏ hàng đang trống.');
+        if (!Array.isArray(expectedItems) || expectedItems.length === 0) {
+            throw new Error('Vui lòng tải lại giỏ hàng trước khi đặt.');
+        }
+
+        const snapshotOf = (items) => items
+            .map((item) => ({ id: String(item.id), price: Number(item.price), quantity: Number(item.quantity) }))
+            .sort((a, b) => a.id.localeCompare(b.id));
+
+        if (JSON.stringify(snapshotOf(cart.items)) !== JSON.stringify(snapshotOf(expectedItems))) {
+            const error = new Error('Giỏ hàng đã thay đổi. Vui lòng kiểm tra lại số lượng và tổng tiền rồi xác nhận.');
+            error.code = 'CART_CHANGED';
+            throw error;
         }
 
         const productIds = new Set();

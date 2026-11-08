@@ -8,7 +8,7 @@ import '../product-management.css';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
-  const { cartItems, addToCar, isLoading, isUpdating } = useCart();
+  const { cartItems, addToCart, isLoading, isUpdating } = useCart();
 
   const [product, setProduct] = useState(null);
   const [status, setStatus] = useState('loading'); // 'loading' | 'error' | 'notFound' | 'ready'
