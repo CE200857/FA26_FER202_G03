@@ -1,22 +1,37 @@
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Container, Form, Button, Alert } from "react-bootstrap";
 import { AuthContext } from "../../../context/AuthContext";
 import { validateRegister } from "../../../utils/validation";
 
 const fields = [
-  { name: "name", label: "Họ tên", type: "text", placeholder: "Nhập họ tên" },
-  { name: "email", label: "Email", type: "email", placeholder: "Nhập email" },
+  {
+    name: "name",
+    label: "Họ tên",
+    type: "text",
+    placeholder: "Nhập họ tên",
+    autoComplete: "name",
+  },
+  {
+    name: "email",
+    label: "Email",
+    type: "email",
+    placeholder: "Nhập email",
+    autoComplete: "email",
+  },
   {
     name: "password",
     label: "Mật khẩu",
     type: "password",
     placeholder: "Tối thiểu 6 ký tự",
+    autoComplete: "new-password",
   },
   {
     name: "confirmPassword",
     label: "Xác nhận mật khẩu",
     type: "password",
     placeholder: "Nhập lại mật khẩu",
+    autoComplete: "new-password",
   },
 ];
 
@@ -30,8 +45,10 @@ const RegisterPage = () => {
     password: "",
     confirmPassword: "",
   });
+
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,11 +66,13 @@ const RegisterPage = () => {
       return;
     }
 
+    setSubmitting(true);
     const result = await register({
       name: formData.name.trim(),
       email: formData.email.trim(),
       password: formData.password,
     });
+    setSubmitting(false);
 
     if (!result.success) {
       setServerError(result.message);
@@ -64,91 +83,44 @@ const RegisterPage = () => {
   };
 
   return (
-    <section
-      style={{
-        maxWidth: "420px",
-        margin: "40px auto",
-        padding: "28px",
-        background: "#ffffff",
-        borderRadius: "8px",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
-      }}
-    >
-      <h2 style={{ marginTop: 0, color: "#b56576", textAlign: "center" }}>
-        Đăng ký tài khoản
-      </h2>
+    <Container className="my-4" style={{ maxWidth: "420px" }}>
+      <h2 className="mb-4 text-center">Đăng ký tài khoản</h2>
 
-      {serverError && (
-        <div
-          style={{
-            padding: "10px 12px",
-            marginBottom: "16px",
-            borderRadius: "6px",
-            backgroundColor: "#f8d7da",
-            color: "#842029",
-            fontSize: "14px",
-          }}
-        >
-          {serverError}
-        </div>
-      )}
+      {serverError && <Alert variant="danger">{serverError}</Alert>}
 
-      <form onSubmit={handleSubmit} noValidate>
+      <Form noValidate onSubmit={handleSubmit}>
         {fields.map((field) => (
-          <div key={field.name} style={{ marginBottom: "16px" }}>
-            <label
-              htmlFor={field.name}
-              style={{ display: "block", marginBottom: "6px" }}
-            >
-              {field.label}
-            </label>
-            <input
-              id={field.name}
+          <Form.Group key={field.name} className="mb-3" controlId={field.name}>
+            <Form.Label>{field.label}</Form.Label>
+            <Form.Control
               type={field.type}
               name={field.name}
+              placeholder={field.placeholder}
               value={formData[field.name]}
               onChange={handleChange}
-              placeholder={field.placeholder}
-              style={{
-                width: "100%",
-                padding: "10px",
-                borderRadius: "6px",
-                border: errors[field.name]
-                  ? "1px solid #dc3545"
-                  : "1px solid #ccc",
-                boxSizing: "border-box",
-              }}
+              isInvalid={!!errors[field.name]}
+              autoComplete={field.autoComplete}
             />
-            {errors[field.name] && (
-              <small style={{ color: "#dc3545" }}>{errors[field.name]}</small>
-            )}
-          </div>
+            <Form.Control.Feedback type="invalid">
+              {errors[field.name]}
+            </Form.Control.Feedback>
+          </Form.Group>
         ))}
 
-        <button
+        <Button
           type="submit"
-          style={{
-            width: "100%",
-            padding: "11px",
-            borderRadius: "6px",
-            border: "none",
-            backgroundColor: "#b56576",
-            color: "#ffffff",
-            fontWeight: "600",
-            cursor: "pointer",
-          }}
+          variant="success"
+          className="w-100 mt-2"
+          disabled={submitting}
         >
-          Đăng ký
-        </button>
-      </form>
+          {submitting ? "Đang đăng ký..." : "Đăng ký"}
+        </Button>
+      </Form>
 
-      <p style={{ textAlign: "center", marginBottom: 0, marginTop: "16px" }}>
-        Đã có tài khoản?{" "}
-        <Link to="/login" style={{ color: "#b56576", fontWeight: "600" }}>
-          Đăng nhập
-        </Link>
+      <p className="text-center mt-3 mb-0">
+        Đã có tài khoản? <Link to="/login">Đăng nhập</Link>
       </p>
-    </section>
+    </Container>
   );
 };
 

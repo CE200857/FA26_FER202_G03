@@ -3,6 +3,7 @@ import { Container, Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
 import { userService } from "../../../services/userService";
+import { validateChangePassword } from "../../../utils/validation";
 
 const ChangePasswordPage = () => {
   const { user } = useContext(AuthContext);
@@ -12,13 +13,13 @@ const ChangePasswordPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submit, setSubmit] = useState(false);
 
-  const validOldPassword = oldPassword !== "";
+  const passwordErrors = validateChangePassword({
+    oldPassword, newPassword, confirmPassword
+  });
 
-  const validNewPassword =
-    newPassword.length >= 6 && newPassword !== oldPassword;
-
-  const validConfirmPassword =
-    confirmPassword !== "" && confirmPassword === newPassword;
+  const validOldPassword = !passwordErrors.oldPassword;
+  const validNewPassword = !passwordErrors.newPassword;
+  const validConfirmPassword = !passwordErrors.confirmPassword;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -73,7 +74,7 @@ const ChangePasswordPage = () => {
             autoComplete="current-password"
           />
           <Form.Control.Feedback type="invalid">
-            Vui lòng nhập mật khẩu hiện tại.
+            {passwordErrors.oldPassword}
           </Form.Control.Feedback>
         </Form.Group>
         <Form.Group className="mb-3" controlId="newPassword">
@@ -88,7 +89,7 @@ const ChangePasswordPage = () => {
             autoComplete="new-password"
           />
           <Form.Control.Feedback type="invalid">
-            Mật khẩu mới phải có ít nhất 6 ký tự và khác mật khẩu hiện tại.
+            {passwordErrors.newPassword}
           </Form.Control.Feedback>
         </Form.Group>
         <Form.Group className="mb-3" controlId="confirmPassword">
@@ -103,7 +104,7 @@ const ChangePasswordPage = () => {
             autoComplete="new-password"
           />
           <Form.Control.Feedback type="invalid">
-            Vui lòng nhập xác nhận trùng với mật khẩu mới.
+            {passwordErrors.confirmPassword}
           </Form.Control.Feedback>
         </Form.Group>
         <div className="d-flex flex-wrap gap-2">
