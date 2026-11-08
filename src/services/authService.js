@@ -25,7 +25,7 @@ export const authService = {
   login: async (email, password) => {
     const users = await getUsersByEmail(email);
 
-    const user = user.find((u) => u.password === password);
+    const user = users.find((u) => u.password === password);
 
     if (!user) {
       throw new Error("Email hoặc mật khẩu không chính xác!");
@@ -48,7 +48,6 @@ export const authService = {
     }
 
     const newUser = {
-      id: "U" + new Date().getTime(),
       name: userData.name,
       email: userData.email,
       password: userData.password,
@@ -57,14 +56,25 @@ export const authService = {
       status: "active",
     };
 
+    let createdUser;
+
     try {
-      await axios.post(`${API_URL}/users`, newUser);
+      const response = await axios.post(
+        `${API_URL}/users`,
+        newUser
+      );
+
+      createdUser = response.data;
     } catch (error) {
       throw new Error("Không thể kết nối đến máy chủ!");
     }
 
-    const userInfo = toUserInfo(newUser);
-    storageService.set(STORAGE_KEYS.CURRENT_USER, userInfo);
+    const userInfo = toUserInfo(createdUser);
+
+    storageService.set(
+      STORAGE_KEYS.CURRENT_USER,
+      userInfo
+    );
 
     return userInfo;
   },
