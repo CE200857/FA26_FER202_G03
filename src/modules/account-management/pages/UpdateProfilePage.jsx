@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect, use } from "react";
 import { Container, Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
@@ -7,24 +7,50 @@ import { userService } from "../../../services/userService";
 const UpdateProfilePage = () => {
   const { user, updateUser } = useContext(AuthContext);
 
-  const profile = user ? userService.getUserById(user.id) : null;
-
-  const [name, setName] = useState(profile ? String(profile.name || "") : "");
-  const [phone, setPhone] = useState(
-    profile ? String(profile.phone || "") : "",
-  );
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [submit, setSubmit] = useState(false);
+
+  useEffect(() => {
+    let ignore = false;
+    const loadProfile = async () => {
+      try {
+        const data = user ? await userService.getUserById(user.id) : null;
+        if (!ignore) {
+          setProfile(data);
+          setName(data ? String(data.name || "") : "");
+          setPhone(data ? String(data.phone || "") : "");
+        }
+      } catch (error) {
+        if (!ignore) {
+          alert(error.message);
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadProfile();
+
+    return () => {
+      ignore = true;
+    };
+  }, [user]);
 
   const validName = name.trim() !== "";
   const validPhone = phone.trim() === "" || /^0\d{9}$/.test(phone.trim());
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmit(true);
 
     if (validName && validPhone) {
       try {
-        const updatedUser = userService.updateProfile(user.id, {
+        const updatedUser = await userService.updateProfile(user.id, {
           name: name.trim(),
           phone: phone.trim(),
         });
@@ -47,6 +73,14 @@ const UpdateProfilePage = () => {
     setPhone(String(profile.phone || ""));
     setSubmit(false);
   };
+
+  if (loading) {
+    return (
+      <Container className="my-4">
+        <p>Đang tải...</p>
+      </Container>
+    );
+  }
 
   if (!profile) {
     return (
