@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { STORAGE_KEYS, storageService } from './storageService';
+import md5 from "md5";
 
 const API_URL = 'http://localhost:5001';
 const toUserInfo = (user) => ({ id: user.id, name: user.name, email: user.email, role: user.role });
@@ -20,7 +21,8 @@ const getUsersByEmail = async (email) => {
 export const authService = {
     login: async (email, password) => {
         const users = await getUsersByEmail(email);
-        const user = users.find((u) => u.password === password);
+        const passwordHash = md5(password);
+        const user = users.find((u) => u.password === passwordHash);
         if (!user) {
             throw new Error('Email hoặc mật khẩu không chính xác!');
         }
@@ -40,7 +42,7 @@ export const authService = {
         const newUser = {
             name: userData.name,
             email: userData.email,
-            password: userData.password,
+            password: md5(userData.password),
             phone: '',
             role: 'Customer',
             status: 'active',

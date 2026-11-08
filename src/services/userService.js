@@ -1,4 +1,6 @@
 import { STORAGE_KEYS, storageService } from "./storageService";
+import md5 from "md5";
+
 const API_URL = "http://localhost:5001";
 
 const getUsers = () => storageService.get(STORAGE_KEYS.USERS, []);
@@ -54,14 +56,14 @@ export const userService = {
         if (!target) {
           throw new Error("Không tìm thấy người dùng!");
         }
-        if (target.password !== oldPassword) {
+        if (target.password !== md5(oldPassword)) {
           throw new Error("Mật khẩu hiện tại không chính xác!");
         }
 
         return fetch(`${API_URL}/users/${id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password: newPassword }),
+          body: JSON.stringify({ password: md5(newPassword) }),
         });
       })
       .then(() => true);
@@ -91,7 +93,7 @@ export const userService = {
       id: "U" + new Date().getTime(),
       name,
       email,
-      password,
+      password: md5(password),
       phone,
       role,
       status: "active",
