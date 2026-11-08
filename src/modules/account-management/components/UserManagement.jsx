@@ -1,4 +1,5 @@
-import { useState, useContext } from "react";
+import React, { useContext, useState } from "react";
+import { Alert, Button, Form, Table } from "react-bootstrap";
 import { AuthContext } from "../../../context/AuthContext";
 import { userService } from "../../../services/userService";
 import { validateUserForm } from "../../../utils/validation";
@@ -11,106 +12,59 @@ const emptyForm = {
   role: "Customer",
 };
 
-const cardStyle = {
-  background: "#ffffff",
-  padding: "24px",
-  borderRadius: "8px",
-  boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
-  marginBottom: "24px",
-};
-
-const inputStyle = (hasError) => ({
-  width: "100%",
-  padding: "10px",
-  borderRadius: "6px",
-  border: hasError ? "1px solid #dc3545" : "1px solid #ccc",
-  boxSizing: "border-box",
-});
-
-const primaryButton = {
-  padding: "10px 18px",
-  borderRadius: "6px",
-  border: "none",
-  backgroundColor: "#b56576",
-  color: "#ffffff",
-  fontWeight: "600",
-  cursor: "pointer",
-};
-
-const secondaryButton = {
-  padding: "10px 18px",
-  borderRadius: "6px",
-  border: "1px solid #ccc",
-  backgroundColor: "#ffffff",
-  color: "#333333",
-  cursor: "pointer",
-};
-
-const smallButton = (color) => ({
-  padding: "6px 12px",
-  borderRadius: "6px",
-  border: "none",
-  backgroundColor: color,
-  color: "#ffffff",
-  fontSize: "13px",
-  cursor: "pointer",
-  marginRight: "6px",
-});
-
-const cellStyle = {
-  padding: "12px",
-  borderBottom: "1px solid #eee",
-  textAlign: "left",
-  fontSize: "14px",
-};
-
 const UserManagement = () => {
   const { user, updateUser: updateAuthUser } = useContext(AuthContext);
 
   const [users, setUsers] = useState(() => userService.getAllUsers());
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [formMode, setFormMode] = useState(null);
+  const [formMode, setFormMode] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState(emptyForm);
   const [errors, setErrors] = useState({});
-  const [message, setMessage] = useState(null);
+  const [message, setMessage] = useState("");
 
-  const reloadUsers = () => setUsers(userService.getAllUsers());
+  const reloadUsers = () => {
+    setUsers(userService.getAllUsers());
+  };
 
-  const filteredUsers = users.filter((u) => {
+  const filteredUsers = user.filter((item) => {
     const keyword = searchTerm.trim().toLowerCase();
+
     const matchesSearch =
-      u.name.toLowerCase().includes(keyword) ||
-      u.email.toLowerCase().includes(keyword);
-    const matchesStatus = statusFilter === "all" || u.status === statusFilter;
+      item.name.toLowerCase().icludes(keyword) ||
+      item.email.toLowerCase().includes(keyword);
+
+    const matchesStatus =
+      statusFilter === "all" || item.status === statusFilter;
+
     return matchesSearch && matchesStatus;
   });
 
-  const handleOpenCreate = () => {
+  const handleAdd = () => {
     setFormMode("create");
     setEditingId(null);
     setFormData(emptyForm);
     setErrors({});
-    setMessage(null);
+    setMessage("");
   };
 
-  const handleOpenEdit = (target) => {
+  const handleEdit = (selectedUser) => {
     setFormMode("edit");
-    setEditingId(target.id);
+    setEditingId(selectedUser.id);
     setFormData({
-      name: target.name,
-      email: target.email,
+      name: selectedUser.name,
+      email: selectedUser.email,
       password: "",
-      phone: target.phone || "",
-      role: target.role,
+      phone: selectedUser.phone || "",
+      role: selectedUser.role,
     });
     setErrors({});
-    setMessage(null);
+    setMessage("");
   };
 
-  const handleCloseForm = () => {
-    setFormMode(null);
+  const handleCancel = () => {
+    setFormMode("");
     setEditingId(null);
     setFormData(emptyForm);
     setErrors({});
@@ -118,8 +72,16 @@ const UserManagement = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    setErrors({ ...errors, [name]: "" });
+
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+
+    setErrors({
+      ...errors,
+      [name]: "",
+    });
   };
 
   const handleSubmit = (e) => {
@@ -127,6 +89,7 @@ const UserManagement = () => {
 
     const isEdit = formMode === "edit";
     const validationErrors = validateUserForm(formData, isEdit);
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -134,20 +97,22 @@ const UserManagement = () => {
 
     try {
       if (isEdit) {
-        const updated = userService.updateUser(editingId, {
+        const updatedUser = userService.updateUser(editingId, {
           name: formData.name.trim(),
           phone: formData.phone.trim(),
           role: formData.role,
         });
-        if (updated.id === user.id) {
+
+        if (updatedUser.id === user.id) {
           updateAuthUser({
-            id: updated.id,
-            name: updated.name,
-            email: updated.email,
-            role: updated.role,
+            id: updatedUser.id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            role: updatedUser.role,
           });
         }
-        setMessage({ type: "success", text: "Cập nhật tài khoản thành công!" });
+
+        setMessage("Cập nhật tài khoản thành công.");
       } else {
         userService.createUser({
           name: formData.name.trim(),
@@ -156,288 +121,210 @@ const UserManagement = () => {
           phone: formData.phone.trim(),
           role: formData.role,
         });
-        setMessage({ type: "success", text: "Thêm tài khoản thành công!" });
+
+        setMessage("Thêm tài khoản thành công.");
       }
+
       reloadUsers();
-      handleCloseForm();
+      handleCancel();
     } catch (error) {
-      setMessage({ type: "error", text: error.message });
+      setMessage(error.message);
     }
   };
 
-  const handleToggleStatus = (target) => {
-    const isLocking = target.status === "active";
-    const confirmed = window.confirm(
-      isLocking
-        ? `Bạn có chắc muốn khóa tài khoản "${target.name}"?`
-        : `Bạn có chắc muốn mở khóa tài khoản "${target.name}"?`,
-    );
-    if (!confirmed) {
+  const handleToggleStatus = (selectedUser) => {
+    const action = selectedUser.status === "active" ? "khóa" : "mở khóa";
+
+    if (!window.confirm(`Bạn có muốn ${action} tài khoản này?`)) {
       return;
     }
 
     try {
-      userService.toggleUserStatus(target.id, user.id);
+      userService.toggleUserStatus(selectedUser.id, user.id);
       reloadUsers();
-      setMessage({
-        type: "success",
-        text: isLocking
-          ? "Đã khóa tài khoản thành công!"
-          : "Đã mở khóa tài khoản thành công!",
-      });
+      setMessage(`Đã ${action} tài khoản thành công.`);
     } catch (error) {
-      setMessage({ type: "error", text: error.message });
+      setMessage(error.message);
     }
   };
 
   return (
     <div>
-      {message && (
-        <div
-          style={{
-            padding: "10px 12px",
-            marginBottom: "16px",
-            borderRadius: "6px",
-            fontSize: "14px",
-            backgroundColor: message.type === "success" ? "#d1e7dd" : "#f8d7da",
-            color: message.type === "success" ? "#0f5132" : "#842029",
-          }}
+      {message && <Alert variant="info">{message}</Alert>}
+
+      <div className="d-flex flex-wrap gap-2 mb-3">
+        <Form.Control
+          type="text"
+          placeholder="Tìm theo tên hoặc email"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ maxWidth: "300px" }}
+        />
+
+        <Form.Select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          style={{ maxWidth: "200px" }}
         >
-          {message.text}
-        </div>
-      )}
+          <option value="all">Tất cả trạng thái</option>
+          <option value="active">Hoạt động</option>
+          <option value="locked">Đã khóa</option>
+        </Form.Select>
+        <Button variant="success" onClick={handleAdd}>
+          Thêm tài khoản
+        </Button>
+      </div>
 
       {formMode && (
-        <section style={cardStyle}>
-          <h3 style={{ marginTop: 0, color: "#b56576" }}>
-            {formMode === "edit" ? "Cập nhật tài khoản" : "Thêm tài khoản mới"}
-          </h3>
-
-          <form onSubmit={handleSubmit} noValidate>
-            <div style={{ marginBottom: "16px" }}>
-              <label
-                htmlFor="um-name"
-                style={{ display: "block", marginBottom: "6px" }}
-              >
-                Họ tên
-              </label>
-              <input
-                id="um-name"
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                style={inputStyle(errors.name)}
-              />
-              {errors.name && (
-                <small style={{ color: "#dc3545" }}>{errors.name}</small>
-              )}
-            </div>
-
-            <div style={{ marginBottom: "16px" }}>
-              <label
-                htmlFor="um-email"
-                style={{ display: "block", marginBottom: "6px" }}
-              >
-                Email
-              </label>
-              <input
-                id="um-email"
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                disabled={formMode === "edit"}
-                style={{
-                  ...inputStyle(errors.email),
-                  backgroundColor: formMode === "edit" ? "#f1f1f1" : "#ffffff",
-                }}
-              />
-              {errors.email && (
-                <small style={{ color: "#dc3545" }}>{errors.email}</small>
-              )}
-            </div>
-
-            {formMode === "create" && (
-              <div style={{ marginBottom: "16px" }}>
-                <label
-                  htmlFor="um-password"
-                  style={{ display: "block", marginBottom: "6px" }}
-                >
-                  Mật khẩu
-                </label>
-                <input
-                  id="um-password"
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Tối thiểu 6 ký tự"
-                  style={inputStyle(errors.password)}
-                />
-                {errors.password && (
-                  <small style={{ color: "#dc3545" }}>{errors.password}</small>
-                )}
-              </div>
-            )}
-
-            <div style={{ marginBottom: "16px" }}>
-              <label
-                htmlFor="um-phone"
-                style={{ display: "block", marginBottom: "6px" }}
-              >
-                Số điện thoại
-              </label>
-              <input
-                id="um-phone"
-                type="text"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="VD: 0901234567"
-                style={inputStyle(errors.phone)}
-              />
-              {errors.phone && (
-                <small style={{ color: "#dc3545" }}>{errors.phone}</small>
-              )}
-            </div>
-
-            <div style={{ marginBottom: "20px" }}>
-              <label
-                htmlFor="um-role"
-                style={{ display: "block", marginBottom: "6px" }}
-              >
-                Vai trò
-              </label>
-              <select
-                id="um-role"
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                disabled={formMode === "edit" && editingId === user.id}
-                style={inputStyle(errors.role)}
-              >
-                <option value="Customer">Customer</option>
-                <option value="Admin">Admin</option>
-              </select>
-              {errors.role && (
-                <small style={{ color: "#dc3545" }}>{errors.role}</small>
-              )}
-            </div>
-
-            <button type="submit" style={{ ...primaryButton, marginRight: "10px" }}>
-              {formMode === "edit" ? "Lưu thay đổi" : "Thêm tài khoản"}
-            </button>
-            <button type="button" onClick={handleCloseForm} style={secondaryButton}>
-              Hủy
-            </button>
-          </form>
-        </section>
-      )}
-
-      <section style={cardStyle}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "12px",
-            marginBottom: "16px",
-            alignItems: "center",
-          }}
+        <Form
+          noValidate
+          onSubmit={handleSubmit}
+          className="border rounded p-3 mb-4"
         >
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Tìm theo họ tên hoặc email"
-            style={{ ...inputStyle(false), flex: "1 1 220px", width: "auto" }}
-          />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            style={{ ...inputStyle(false), width: "auto" }}
-          >
-            <option value="all">Tất cả trạng thái</option>
-            <option value="active">Đang hoạt động</option>
-            <option value="locked">Đã khóa</option>
-          </select>
-          <button type="button" onClick={handleOpenCreate} style={primaryButton}>
-            + Thêm tài khoản
-          </button>
-        </div>
+          <h4>{formMode === "create" ? "Thêm tài khoản" : "Sửa tài khoản"}</h4>
 
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ backgroundColor: "#f8f9fa" }}>
-                <th style={cellStyle}>ID</th>
-                <th style={cellStyle}>Họ tên</th>
-                <th style={cellStyle}>Email</th>
-                <th style={cellStyle}>Số điện thoại</th>
-                <th style={cellStyle}>Vai trò</th>
-                <th style={cellStyle}>Trạng thái</th>
-                <th style={cellStyle}>Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={7}
-                    style={{ ...cellStyle, textAlign: "center", color: "#777" }}
+          <Form.Group className="mb-3" controlId="userName">
+            <Form.Label>Họ tên</Form.Label>
+            <Form.Control
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              isInvalid={!!errors.name}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.name}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="userEmail">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              disabled={formMode === "edit"}
+              isInvalid={!!errors.email}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.email}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          {formMode === "create" && (
+            <Form.Group className="mb-3" controlId="userPassword">
+              <Form.Label>Mật khẩu</Form.Label>
+              <Form.Control
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                isInvalid={!!errors.password}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.password}
+              </Form.Control.Feedback>
+            </Form.Group>
+          )}
+
+          <Form.Group className="mb-3" controlId="userPhone">
+            <Form.Label>Số điện thoại</Form.Label>
+            <Form.Control
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              isInvalid={!!errors.phone}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.phone}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="userRole">
+            <Form.Label>Vai trò</Form.Label>
+            <Form.Select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              disabled={formMode === "edit" && editingId === user.id}
+              isInvalid={!!errors.role}
+            >
+              <option value="Customer">Customer</option>
+              <option value="Admin">Admin</option>
+            </Form.Select>
+            <Form.Control.Feedback type="invalid">
+              {errors.role}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          <Button type="submit" variant="success" className="me-2">
+            Lưu
+          </Button>
+          <Button type="button" variant="secondary" onClick={handleCancel}>
+            Hủy
+          </Button>
+        </Form>
+      )}
+      <Table bordered hover responsive>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Họ tên</th>
+            <th>Email</th>
+            <th>Số điện thoại</th>
+            <th>Vai trò</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {filteredUsers.length === 0 && (
+            <tr>
+              <td colSpan={7} className="text-center">
+                Không tìm thấy tài khoản nào.
+              </td>
+            </tr>
+          )}
+
+          {filteredUsers.map((item) => (
+            <tr key={item.id}>
+              <td>{item.id}</td>
+              <td>{item.name}</td>
+              <td>{item.email}</td>
+              <td>{item.phone || "-"}</td>
+              <td>{item.role}</td>
+              <td>{item.status === "active" ? "Hoạt động" : "Đã khóa"}</td>
+              <td>
+                <Button
+                  size="sm"
+                  variant="outline-primary"
+                  className="me-2 mb-1"
+                  onClick={() => handleEdit(item)}
+                >
+                  Sửa
+                </Button>
+
+                {item.id !== user.id && (
+                  <Button
+                    size="sm"
+                    variant={
+                      item.status === "active"
+                        ? "outline-danger"
+                        : "outline-success"
+                    }
+                    className="mb-1"
+                    onClick={() => handleToggleStatus(item)}
                   >
-                    Không tìm thấy tài khoản nào.
-                  </td>
-                </tr>
-              )}
-              {filteredUsers.map((u) => (
-                <tr key={u.id}>
-                  <td style={cellStyle}>{u.id}</td>
-                  <td style={cellStyle}>{u.name}</td>
-                  <td style={cellStyle}>{u.email}</td>
-                  <td style={cellStyle}>{u.phone || "—"}</td>
-                  <td style={cellStyle}>{u.role}</td>
-                  <td style={cellStyle}>
-                    <span
-                      style={{
-                        padding: "4px 10px",
-                        borderRadius: "12px",
-                        fontSize: "12px",
-                        fontWeight: "600",
-                        backgroundColor:
-                          u.status === "active" ? "#d1e7dd" : "#f8d7da",
-                        color: u.status === "active" ? "#0f5132" : "#842029",
-                      }}
-                    >
-                      {u.status === "active" ? "Hoạt động" : "Đã khóa"}
-                    </span>
-                  </td>
-                  <td style={cellStyle}>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenEdit(u)}
-                      style={smallButton("#355070")}
-                    >
-                      Sửa
-                    </button>
-                    {u.id !== user.id && (
-                      <button
-                        type="button"
-                        onClick={() => handleToggleStatus(u)}
-                        style={smallButton(
-                          u.status === "active" ? "#dc3545" : "#198754",
-                        )}
-                      >
-                        {u.status === "active" ? "Khóa" : "Mở khóa"}
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+                    {item.status === "active" ? "Khóa" : "Mở khóa"}
+                  </Button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </div>
   );
 };
