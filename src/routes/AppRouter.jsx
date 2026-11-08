@@ -19,6 +19,7 @@ import ReviewManagementPage from '../modules/review-management/pages/ReviewManag
 import OrderHistoryPage from '../modules/cart-order/pages/OrderHistoryPage';
 import CheckoutPage from '../modules/cart-order/pages/CheckoutPage';
 import OrderManagement from '../modules/cart-order/components/OrderManagement';
+import ProductReviewPage from "../modules/review-management/pages/ProductReviewPage";
 
 const PlaceholderPage = ({ title }) => (
     <section style={{ padding: '24px', background: '#fff', borderRadius: '8px' }}>
@@ -43,6 +44,7 @@ const AppRouter = () => {
                     <Route path="/checkout" element={<CheckoutPage />} />
                     <Route path="/orders/history" element={<OrderHistoryPage />} />
                     <Route path="/vouchers" element={<MyVouchersPage />} />
+                    <Route path="/reviews" element={<ProductReviewPage />} />
                 </Route>
             </Route>
 

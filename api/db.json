@@ -28,7 +28,7 @@
       "id": "U001",
       "name": "Quản lý Cửa hàng",
       "email": "admin@spasalon.com",
-      "password": "password123",
+      "password": "482c811da5d5b4bc6d497ffa98491e38",
       "role": "Admin",
       "phone": "0901234567",
       "status": "active"
@@ -37,7 +37,7 @@
       "id": "U002",
       "name": "Khách hàng Thân thiết",
       "email": "customer@spasalon.com",
-      "password": "password123",
+      "password": "482c811da5d5b4bc6d497ffa98491e38",
       "role": "Customer",
       "phone": "0987654321",
       "status": "active"
@@ -46,7 +46,7 @@
       "id": "U003",
       "name": "Tài khoản bị khóa",
       "email": "locked@gmail.com",
-      "password": "password123",
+      "password": "482c811da5d5b4bc6d497ffa98491e38",
       "role": "Customer",
       "phone": "0912345678",
       "status": "locked"
@@ -54,11 +54,20 @@
     {
       "name": "Thành Đạt Trần",
       "email": "datttce200857@gmail.com",
-      "password": "123456",
+      "password": "482c811da5d5b4bc6d497ffa98491e38",
       "phone": "",
       "role": "Customer",
       "status": "active",
       "id": "YMQ41EPDT7o"
+    },
+    {
+      "name": "Nguyễn Tiến Đạt",
+      "email": "datnt29052005@gmail.com",
+      "password": "e10adc3949ba59abbe56e057f20f883e",
+      "phone": "",
+      "role": "Customer",
+      "status": "active",
+      "id": "VzgWH6fjBqE"
     }
   ],
   "carts": [
