@@ -50,6 +50,52 @@
       "role": "Customer",
       "phone": "0912345678",
       "status": "locked"
+    },
+    {
+      "name": "Thành Đạt Trần",
+      "email": "datttce200857@gmail.com",
+      "password": "123456",
+      "phone": "",
+      "role": "Customer",
+      "status": "active",
+      "id": "YMQ41EPDT7o"
+    }
+  ],
+  "carts": [
+    {
+      "id": "id-do-json-server-tao",
+      "userId": "U002",
+      "items": [
+        {
+          "id": "P001",
+          "name": "Tinh chất dưỡng trắng Vitamin C Spa",
+          "price": 450000,
+          "stock": 25,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "userId": "YMQ41EPDT7o",
+      "items": [
+        {
+          "id": "P001",
+          "name": "Tinh chất dưỡng trắng Vitamin C Spa",
+          "price": 450000,
+          "image": "https://placehold.co/300x300?text=Serum+Vitamin+C",
+          "stock": 25,
+          "quantity": 3
+        },
+        {
+          "id": "P002",
+          "name": "Dầu gội phục hồi tóc hư tổn Salon Pro",
+          "price": 380000,
+          "image": "https://placehold.co/300x300?text=Salon+Shampoo",
+          "stock": 15,
+          "quantity": 2
+        }
+      ],
+      "id": "sxDW4q4Fs1c"
     }
   ],
   "orders": [
@@ -97,5 +143,6 @@
       "status": "approved",
       "createdAt": "2026-10-15"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
