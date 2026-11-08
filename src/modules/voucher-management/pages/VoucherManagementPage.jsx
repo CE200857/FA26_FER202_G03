@@ -25,15 +25,42 @@ const VoucherManagementPage = () => {
     const [editingVoucher, setEditingVoucher] = useState(null);
     const [createError, setCreateError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const [loading, setLoading] = useState(true);
 
     const showVoucherForm = showCreateForm || Boolean(editingVoucher);
 
     useEffect(() => {
-        try {
-            setVouchers(voucherService.getAll());
-        } catch {
-            setError('Không thể tải danh sách voucher.');
-        }
+        let isMounted = true;
+
+        const fetchVouchers = async () => {
+            try {
+                setLoading(true);
+                setError('');
+
+                const data = await voucherService.getAll();
+
+                if (isMounted) {
+                    setVouchers(data);
+                }
+            } catch (loadError) {
+                if (isMounted) {
+                    setError(
+                        loadError.message ||
+                        'Không thể tải danh sách voucher.'
+                    );
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchVouchers();
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     const filteredVouchers = vouchers.filter((voucher) => {
@@ -69,22 +96,30 @@ const VoucherManagementPage = () => {
         setCreateError('');
     };
 
-    const handleSubmitVoucher = (voucherData) => {
+    const handleSubmitVoucher = async (voucherData) => {
         try {
             if (editingVoucher) {
-                const updatedVoucher = voucherService.update(
+                const updatedVoucher = await voucherService.update(
                     editingVoucher.id,
                     voucherData
                 );
 
-                setVouchers(voucherService.getAll());
+                setVouchers((previous) =>
+                    previous.map((voucher) =>
+                        String(voucher.id) === String(updatedVoucher.id)
+                            ? updatedVoucher
+                            : voucher
+                    )
+                );
+
                 setSuccessMessage(
                     `Cập nhật voucher ${updatedVoucher.code} thành công.`
                 );
             } else {
-                const newVoucher = voucherService.create(voucherData);
+                const newVoucher = await voucherService.create(voucherData);
 
-                setVouchers(voucherService.getAll());
+                setVouchers((previous) => [...previous, newVoucher]);
+
                 setSuccessMessage(
                     `Tạo voucher ${newVoucher.code} thành công.`
                 );
@@ -104,11 +139,12 @@ const VoucherManagementPage = () => {
                     ? submitError.message
                     : `Không thể ${action} voucher.`
             );
+
             setSuccessMessage('');
         }
     };
 
-    const handleDeleteVoucher = (voucher) => {
+    const handleDeleteVoucher = async (voucher) => {
         const confirmed = window.confirm(
             `Bạn có chắc chắn muốn xóa voucher "${voucher.code}" không?`
         );
@@ -116,12 +152,18 @@ const VoucherManagementPage = () => {
         if (!confirmed) return;
 
         try {
-            voucherService.delete(voucher.id);
+            await voucherService.delete(voucher.id);
 
-            setVouchers(voucherService.getAll());
+            setVouchers((previous) =>
+                previous.filter(
+                    (item) => String(item.id) !== String(voucher.id)
+                )
+            );
+
             setSuccessMessage(
                 `Đã xóa voucher "${voucher.code}" thành công.`
             );
+
             setError('');
         } catch (deleteError) {
             setError(
@@ -129,6 +171,7 @@ const VoucherManagementPage = () => {
                     ? deleteError.message
                     : 'Không thể xóa voucher.'
             );
+
             setSuccessMessage('');
         }
     };
@@ -208,6 +251,13 @@ const VoucherManagementPage = () => {
                     </thead>
 
                     <tbody>
+                        {loading && (
+                            <tr>
+                                <td colSpan={7} className="voucher-empty">
+                                    Đang tải danh sách voucher...
+                                </td>
+                            </tr>
+                        )}
                         {filteredVouchers.map((voucher) => (
                             <tr key={voucher.id}>
                                 <td>
@@ -261,7 +311,7 @@ const VoucherManagementPage = () => {
                             </tr>
                         ))}
 
-                        {filteredVouchers.length === 0 && (
+                        {!loading && filteredVouchers.length === 0 && (
                             <tr>
                                 <td
                                     colSpan={7}
