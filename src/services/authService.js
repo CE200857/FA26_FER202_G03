@@ -1,64 +1,73 @@
-import { initialUsers } from '../data/mockData';
+import { STORAGE_KEYS, storageService } from "./storageService";
 
-const initializeUsers = () => {
-    if (!localStorage.getItem('users')) {
-        localStorage.setItem('users', JSON.stringify(initialUsers));
-    }
-};
+const API_URL = "http://localhost:5001";
+
+const toUserInfo = (user) => ({
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+});
 
 export const authService = {
-    login: (email, password) => {
-        initializeUsers();
-        const users = JSON.parse(localStorage.getItem('users'));
-        
-        const user = users.find(u => u.email === email && u.password === password);
+  login: (email, password) => {
+    return fetch(`${API_URL}/users?email=${email}`)
+      .then((res) => res.json())
+      .then((users) => {
+        const user = users.find((u) => u.password === password);
 
         if (!user) {
-            throw new Error("Email hoặc mật khẩu không chính xác!");
+          throw new Error("Email hoặc mật khẩu không chính xác!");
         }
         if (user.status !== "active") {
-            throw new Error("Tài khoản của bạn đã bị khóa bởi quản trị viên!");
+          throw new Error("Tài khoản của bạn đã bị khóa bởi quản trị viên!");
         }
 
-        const userInfo = { id: user.id, name: user.name, email: user.email, role: user.role };
-        localStorage.setItem('currentUser', JSON.stringify(userInfo));
-        
-        return userInfo;
-    },
+        const userInfo = toUserInfo(user);
+        storageService.set(STORAGE_KEYS.CURRENT_USER, userInfo);
 
-    register: (userData) => {
-        initializeUsers();
-        const users = JSON.parse(localStorage.getItem('users'));
-        
-        const isEmailExist = users.some(u => u.email === userData.email);
-        if (isEmailExist) {
-            throw new Error("Email này đã được sử dụng!");
+        return userInfo;
+      });
+  },
+
+  register: (userData) => {
+    return fetch(`${API_URL}/users?email=${userData.email}`)
+      .then((res) => res.json())
+      .then((users) => {
+        if (users.length > 0) {
+          throw new Error("Email này đã được sử dụng!");
         }
 
         const newUser = {
-            id: new Date().getTime(),
-            name: userData.name,
-            email: userData.email,
-            password: userData.password,
-            role: "Customer",
-            status: "active"
+          id: "U" + new Date().getTime(),
+          name: userData.name,
+          email: userData.email,
+          password: userData.password,
+          phone: "",
+          role: "Customer",
+          status: "active",
         };
 
-        users.push(newUser);
-        localStorage.setItem('users', JSON.stringify(users));
+        return fetch(`${API_URL}/users`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newUser),
+        });
+      })
+      .then((res) => res.json())
+      .then((createdUser) => {
+        const userInfo = toUserInfo(createdUser);
+        storageService.set(STORAGE_KEYS.CURRENT_USER, userInfo);
 
-        const userInfo = { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role };
-        localStorage.setItem('currentUser', JSON.stringify(userInfo));
-        
         return userInfo;
-    },
+      });
+  },
 
-    logout: () => {
-        localStorage.removeItem('currentUser');
-    },
+  logout: () => {
+    storageService.remove(STORAGE_KEYS.CURRENT_USER);
+  },
 
-    getCurrentUser: () => {
-        const userStr = localStorage.getItem('currentUser');
-        return userStr ? JSON.parse(userStr) : null;
-    }
+  getCurrentUser: () => {
+    return storageService.get(STORAGE_KEYS.CURRENT_USER, null);
+  },
 };

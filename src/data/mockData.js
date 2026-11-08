@@ -27,33 +27,35 @@ export const initialProducts = [
 ];
 
 // Module 3: User (Nguyễn Tiến Đạt)
+// role: 'Admin' | 'Customer' — status: 'active' | 'locked'
 export const initialUsers = [
   {
     id: 'U001',
-    fullName: 'Quản lý Cửa hàng',
+    name: 'Quản lý Cửa hàng',
     email: 'admin@spasalon.com',
     password: 'password123',
-    role: 'admin',
+    role: 'Admin',
     phone: '0901234567',
-    isActive: true,
+    status: 'active',
   },
   {
     id: 'U002',
-    fullName: 'Khách hàng Thân thiết',
+    name: 'Khách hàng Thân thiết',
     email: 'customer@spasalon.com',
     password: 'password123',
-    role: 'customer',
+    role: 'Customer',
     phone: '0987654321',
-    isActive: true,
+    status: 'active',
   },
   {
     id: 'U003',
-    name: "Tài khoản bị khóa",
-    email: "locked@gmail.com",
-    password: "password123",
-    role: "Customer",
-    status: "locked"
-  }
+    name: 'Tài khoản bị khóa',
+    email: 'locked@gmail.com',
+    password: 'password123',
+    role: 'Customer',
+    phone: '0912345678',
+    status: 'locked',
+  },
 ];
 
 //  Module 2: Orders (Trần Thành Đạt) 
