@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Container, Card, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
@@ -8,7 +8,43 @@ import { userService } from "../../../services/userService";
 const UserProfilePage = () => {
   const { user } = useContext(AuthContext);
 
-  const profile = user ? userService.getUserById(user.id) : null;
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const loadProfile = async () => {
+      try {
+        const data = user ? await userService.getUserById(user.id) : null;
+        if (!ignore) {
+          setProfile(data);
+        }
+      } catch (error) {
+        if (!ignore) {
+          alert(error.message);
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadProfile();
+
+    return () => {
+      ignore = true;
+    };
+  }, [user]);
+
+  if (loading) {
+    return (
+      <Container className="my-4">
+        <p>Đang tải...</p>
+      </Container>
+    );
+  }
 
   if (!profile) {
     return (
@@ -41,10 +77,10 @@ const UserProfilePage = () => {
           </Card.Text>
           <div className="d-flex flex-wrap gap-2 mt-4">
             <Button as={Link} to="/profile/update" variant="success">
-                Cập nhật hồ sơ
+              Cập nhật hồ sơ
             </Button>
             <Button as={Link} to="/profile/change-password" variant="secondary">
-                Đổi mật khẩu
+              Đổi mật khẩu
             </Button>
           </div>
         </Card.Body>
@@ -53,4 +89,4 @@ const UserProfilePage = () => {
   );
 };
 
-export default UserProfilePage
+export default UserProfilePage;

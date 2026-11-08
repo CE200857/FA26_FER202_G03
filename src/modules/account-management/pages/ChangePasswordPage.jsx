@@ -20,13 +20,13 @@ const ChangePasswordPage = () => {
   const validConfirmPassword =
     confirmPassword !== "" && confirmPassword === newPassword;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmit(true);
 
     if (validOldPassword && validNewPassword && validConfirmPassword) {
       try {
-        userService.changePassword(user.id, oldPassword, newPassword);
+        await userService.changePassword(user.id, oldPassword, newPassword);
 
         alert("Đổi mật khẩu thành công!");
 
