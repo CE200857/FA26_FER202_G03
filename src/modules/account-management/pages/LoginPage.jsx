@@ -9,14 +9,14 @@ const LoginPage = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const [formData, setformData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setformData({ ...formData, [name]: value });
+    setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: "" });
     setServerError("");
   };
