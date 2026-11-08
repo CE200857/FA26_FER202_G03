@@ -187,6 +187,16 @@ export const CartProvider = ({ children }) => {
 
         clearCart: () =>
           mutateCart((id) => cartService.clearCart(id)),
+
+        clearCartAfterOrder: async (orderItems) => {
+          let cleared = false;
+          const success = await mutateCart(async (id) => {
+            const result = await cartService.clearCartAfterOrder(id, orderItems);
+            cleared = result.cleared;
+            return result.items;
+          });
+          return success && cleared;
+        },
       }}
     >
       {children}

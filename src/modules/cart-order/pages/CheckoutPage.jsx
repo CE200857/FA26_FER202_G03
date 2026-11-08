@@ -100,7 +100,7 @@ const CheckoutPage = () => {
 
         if (ownerSession !== session.current) return;
 
-        const cleared = await clearCart();
+        const cleared = await clearCartAfterOrder(createdOrder.items);
 
         if (ownerSession !== session.current) return;
 
@@ -110,8 +110,7 @@ const CheckoutPage = () => {
             );
         } else {
             toast.info(
-                `Đơn #${createdOrder.id} đã được tạo, ` + 'nhưng chưa xóa được giỏ hàng. ' + 'Hãy kiểm tra lịch sử trước khi đặt lại.'
-            );
+                `Đơn #${createdOrder.id} đã được tạo. Giỏ hàng được giữ lại vì có thay đổi hoặc chưa xóa được. Hãy kiểm tra trước khi mua tiếp.`);
         }
         navigate('/orders/history', { replace: true });
     };
@@ -232,7 +231,7 @@ const CheckoutPage = () => {
                                         <p className="fw-semibold mb-1"> {item.name}</p>
                                         <div className="d-flex justify-content-between gap-2">
                                             <span> {item.quantity} ×{' '} {formatCurrency(Number(item.price))} </span>
-                                            <strong> {formatCurrency( Number(item.price) * Number(item.quantity))}</strong>
+                                            <strong> {formatCurrency(Number(item.price) * Number(item.quantity))}</strong>
                                         </div>
                                     </li>
                                 ))}

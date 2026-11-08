@@ -225,4 +225,25 @@ export const cartService = {
         : [];
     });
   },
+
+      async clearCartAfterOrder(userId, orderItems) {
+        if (!Array.isArray(orderItems) || orderItems.length === 0) {
+            throw new Error('Thông tin đơn hàng không hợp lệ.');
+        }
+        const snapshotOf = (items) => items
+            .map((item) => ({ id: String(item.productId ?? item.id), price: Number(item.price), quantity: Number(item.quantity) }))
+            .sort((a, b) => a.id.localeCompare(b.id));
+
+        return forUser(userId, async (id) => {
+            const record = await readCart(id);
+            if (!record || record.items.length === 0) {
+                return { items: [], cleared: true };
+            }
+            if (JSON.stringify(snapshotOf(record.items)) !== JSON.stringify(snapshotOf(orderItems))) {
+                return { items: record.items, cleared: false };
+            }
+            const items = await saveCart(id, record, []);
+            return { items, cleared: true };
+        });
+    },
 };
