@@ -1,3 +1,4 @@
+import OrderHistoryPage from '../modules/cart-order/pages/OrderHistoryPage';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import CustomerLayout from '../layouts/CustomerLayout';
 import AdminLayout from '../layouts/AdminLayout';
@@ -40,7 +41,7 @@ const AppRouter = () => {
 
         <Route element={<ProtectedRoute allowedRoles={['Customer']} />}>
           <Route path="/checkout" element={<PlaceholderPage title="Thanh toán Đơn hàng (Checkout)" />} />
-          <Route path="/orders/history" element={<PlaceholderPage title="Lịch sử Mua hàng (Order History)" />} />
+          <Route path="/orders/history" element={<OrderHistoryPage />}/>
           <Route path="/vouchers" element={<MyVouchersPage />} />
         </Route>
       </Route>
