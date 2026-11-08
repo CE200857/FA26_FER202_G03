@@ -28,7 +28,7 @@
       "id": "U001",
       "name": "Quản lý Cửa hàng",
       "email": "admin@spasalon.com",
-      "password": "password123",
+      "password": "482c811da5d5b4bc6d497ffa98491e38",
       "role": "Admin",
       "phone": "0901234567",
       "status": "active"
@@ -37,7 +37,7 @@
       "id": "U002",
       "name": "Khách hàng Thân thiết",
       "email": "customer@spasalon.com",
-      "password": "password123",
+      "password": "482c811da5d5b4bc6d497ffa98491e38",
       "role": "Customer",
       "phone": "0987654321",
       "status": "active"
@@ -46,10 +46,57 @@
       "id": "U003",
       "name": "Tài khoản bị khóa",
       "email": "locked@gmail.com",
-      "password": "password123",
+      "password": "482c811da5d5b4bc6d497ffa98491e38",
       "role": "Customer",
       "phone": "0912345678",
       "status": "locked"
+    },
+    {
+      "name": "Thành Đạt Trần",
+      "email": "datttce200857@gmail.com",
+      "password": "482c811da5d5b4bc6d497ffa98491e38",
+      "phone": "",
+      "role": "Customer",
+      "status": "active",
+      "id": "YMQ41EPDT7o"
+    },
+    {
+      "name": "Nguyễn Tiến Đạt",
+      "email": "datnt29052005@gmail.com",
+      "password": "e10adc3949ba59abbe56e057f20f883e",
+      "phone": "",
+      "role": "Customer",
+      "status": "active",
+      "id": "VzgWH6fjBqE"
+    }
+  ],
+  "carts": [
+    {
+      "id": "id-do-json-server-tao",
+      "userId": "U002",
+      "items": [
+        {
+          "id": "P001",
+          "name": "Tinh chất dưỡng trắng Vitamin C Spa",
+          "price": 450000,
+          "stock": 25,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "userId": "YMQ41EPDT7o",
+      "items": [
+        {
+          "id": "P001",
+          "name": "Tinh chất dưỡng trắng Vitamin C Spa",
+          "price": 450000,
+          "image": "https://placehold.co/300x300?text=Serum+Vitamin+C",
+          "stock": 25,
+          "quantity": 1
+        }
+      ],
+      "id": "sxDW4q4Fs1c"
     }
   ],
   "orders": [
@@ -71,6 +118,33 @@
       "status": "Completed",
       "shippingAddress": "Ninh Kiều, Cần Thơ",
       "createdAt": "2026-10-14T10:00:00.000Z"
+    },
+    {
+      "userId": "YMQ41EPDT7o",
+      "recipientName": "Thành Đạt Trần",
+      "phone": "0993456789",
+      "shippingAddress": "Cần Thơ",
+      "items": [
+        {
+          "productId": "P001",
+          "name": "Tinh chất dưỡng trắng Vitamin C Spa",
+          "price": 450000,
+          "quantity": 3
+        },
+        {
+          "productId": "P002",
+          "name": "Dầu gội phục hồi tóc hư tổn Salon Pro",
+          "price": 380000,
+          "quantity": 2
+        }
+      ],
+      "subtotal": 2110000,
+      "discountAmount": 0,
+      "totalAmount": 2110000,
+      "voucherCode": null,
+      "status": "Completed",
+      "createdAt": "2026-11-08T14:19:53.182Z",
+      "id": "vUfzSrMgnmc"
     }
   ],
   "vouchers": [
@@ -97,5 +171,6 @@
       "status": "approved",
       "createdAt": "2026-10-15"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }

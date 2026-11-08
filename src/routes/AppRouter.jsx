@@ -1,38 +1,3 @@
-<<<<<<< Updated upstream
-import { Routes, Route, Navigate } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
-import CustomerLayout from "../layouts/CustomerLayout";
-import AdminLayout from "../layouts/AdminLayout";
-import ProtectedRoute from "./ProtectedRoute";
-import ProductCatalogPage from "../modules/product-management/pages/ProductCatalogPage";
-import ProductDetailPage from "../modules/product-management/pages/ProductDetailPage";
-import AdminDashboardPage from "../modules/product-management/pages/AdminDashboardPage";
-import LoginPage from "../modules/account-management/pages/LoginPage";
-import RegisterPage from "../modules/account-management/pages/RegisterPage";
-import UserProfilePage from "../modules/account-management/pages/UserPageProfile";
-import UpdateProfilePage from "../modules/account-management/pages/UpdateProfilePage";
-import ChangePasswordPage from "../modules/account-management/pages/ChangePasswordPage";
-import UserManagement from "../modules/account-management/components/UserManagement";
-import VoucherManagementPage from "../modules/voucher-management/pages/VoucherManagementPage";
-import MyVouchersPage from "../modules/voucher-management/pages/MyVouchersPage";
-import ReviewManagementPage from "../modules/review-management/pages/ReviewManagementPage";
-import ReviewModerationPage from '../modules/review-management/components/ReviewModeration';
-import ProductReviewPage from '../modules/review-management/pages/ProductReviewPage';
-
-const PlaceholderPage = ({ title }) => (
-  <section style={{ padding: "24px", background: "#fff", borderRadius: "8px" }}>
-    <h2>{title}</h2>
-    <p>Chức năng này sẽ hoàn thiện ở tuần sau.</p>
-  </section>
-);
-
-const AppRouter = () => {
-  const { isAdmin } = useContext(AuthContext);
-  return (
-    <Routes>
-      {/* KHU VỰC KHÁCH HÀNG (Customer) */}
-=======
 // src/routes/AppRouter.jsx
 import { Routes, Route, Navigate } from 'react-router-dom';
 import CustomerLayout from '../layouts/CustomerLayout';
@@ -58,61 +23,10 @@ const AppRouter = () => {
   return (
     <Routes>
       {/* GIAO DIỆN KHÁCH HÀNG */}
->>>>>>> Stashed changes
       <Route element={<CustomerLayout />}>
         <Route path="/" element={<ProductCatalogPage />} />
         <Route path="/products" element={<ProductCatalogPage />} />
         <Route path="/products/:id" element={<ProductDetailPage />} />
-<<<<<<< Updated upstream
-        <Route path="/products/:id/reviews" element={<ProductReviewPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-
-        <Route element={<ProtectedRoute allowedRoles={["Customer"]} />}>
-          <Route
-            path="/checkout"
-            element={<PlaceholderPage title="Thanh toán Đơn hàng (Checkout)" />}
-          />
-          <Route
-            path="/orders/history"
-            element={
-              <PlaceholderPage title="Lịch sử Mua hàng (Order History)" />
-            }
-          />
-          <Route path="/vouchers" element={<MyVouchersPage />} />
-        </Route>
-      </Route>
-
-      <Route elememt={<ProtectedRoute />}>
-        <Route element={isAdmin ? <AdminLayout /> : <CustomerLayout />}>
-          <Route path="/profile" element={<UserProfilePage />} />
-          <Route path="/profile/update" element={<UpdateProfilePage />} />
-          <Route
-            path="/profile/change-password"
-            element={<ChangePasswordPage />}
-          />
-        </Route>
-      </Route>
-
-      {/* KHU VỰC QUẢN TRỊ (Admin) */}
-      <Route element={<ProtectedRoute allowedRoles={['Admin', 'Customer']} />}>
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboardPage />} />
-          <Route
-            path="products"
-            element={<PlaceholderPage title="Quản lý sản phẩm" />}
-          />
-          <Route
-            path="orders"
-            element={<PlaceholderPage title="Quản lý đơn hàng" />}
-          />
-          <Route path="users" element={<UserManagement />} />
-          <Route path="vouchers" element={<VoucherManagementPage />} />
-          <Route path="reviews" element={<ReviewModerationPage />} />
-        </Route>
-      </Route>
-
-=======
 
         {/* ĐƯỜNG DẪN ĐÁNH GIÁ CHUẨN CỦA DỰ ÁN */}
         <Route path="/reviews" element={<ProductReviewPage />} />
@@ -141,7 +55,6 @@ const AppRouter = () => {
       </Route>
 
       {/* FALLBACK KHÔNG TÌM THẤY TRANG */}
->>>>>>> Stashed changes
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
