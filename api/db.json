@@ -86,7 +86,24 @@
     },
     {
       "userId": "YMQ41EPDT7o",
-      "items": [],
+      "items": [
+        {
+          "id": "P001",
+          "name": "Tinh chất dưỡng trắng Vitamin C Spa",
+          "price": 450000,
+          "image": "https://placehold.co/300x300?text=Serum+Vitamin+C",
+          "stock": 25,
+          "quantity": 2
+        },
+        {
+          "id": "P002",
+          "name": "Dầu gội phục hồi tóc hư tổn Salon Pro",
+          "price": 380000,
+          "image": "https://placehold.co/300x300?text=Salon+Shampoo",
+          "stock": 15,
+          "quantity": 2
+        }
+      ],
       "id": "sxDW4q4Fs1c"
     }
   ],
@@ -163,6 +180,60 @@
       "status": "Cancelled",
       "createdAt": "2026-11-08T15:50:59.470Z",
       "id": "0NBh5HOzLRc"
+    },
+    {
+      "userId": "YMQ41EPDT7o",
+      "recipientName": "Thành Đạt Trần",
+      "phone": "0993456789",
+      "shippingAddress": "fadsf",
+      "items": [
+        {
+          "productId": "P001",
+          "name": "Tinh chất dưỡng trắng Vitamin C Spa",
+          "price": 450000,
+          "quantity": 2
+        },
+        {
+          "productId": "P002",
+          "name": "Dầu gội phục hồi tóc hư tổn Salon Pro",
+          "price": 380000,
+          "quantity": 2
+        }
+      ],
+      "subtotal": 1660000,
+      "discountAmount": 0,
+      "totalAmount": 1660000,
+      "voucherCode": null,
+      "status": "Pending",
+      "createdAt": "2026-11-08T17:29:13.812Z",
+      "id": "tu9tLBtHG6Y"
+    },
+    {
+      "userId": "YMQ41EPDT7o",
+      "recipientName": "Thành Đạt Trần",
+      "phone": "0993456789",
+      "shippingAddress": "Can tho",
+      "items": [
+        {
+          "productId": "P001",
+          "name": "Tinh chất dưỡng trắng Vitamin C Spa",
+          "price": 450000,
+          "quantity": 2
+        },
+        {
+          "productId": "P002",
+          "name": "Dầu gội phục hồi tóc hư tổn Salon Pro",
+          "price": 380000,
+          "quantity": 2
+        }
+      ],
+      "subtotal": 1660000,
+      "discountAmount": 0,
+      "totalAmount": 1660000,
+      "voucherCode": null,
+      "status": "Pending",
+      "createdAt": "2026-11-08T17:29:39.573Z",
+      "id": "4wTBEtIOzfk"
     }
   ],
   "vouchers": [

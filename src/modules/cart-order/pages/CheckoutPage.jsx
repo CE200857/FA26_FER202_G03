@@ -10,7 +10,7 @@ import CartSummary from '../components/CartSummary';
 
 const CheckoutPage = () => {
     const { user } = useContext(AuthContext);
-    const { cartItems, subtotal, isLoading, isUpdating, error: cartError, reloadCart, clearCart } = useCart();
+    const { cartItems, subtotal, isLoading, isUpdating, error: cartError, reloadCart, clearCartAfterOrder } = useCart();
     const toast = useToast();
     const navigate = useNavigate();
     const userId = user?.id == null ? null : String(user.id);
