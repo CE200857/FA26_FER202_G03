@@ -57,13 +57,15 @@ export const authService = {
       status: "active",
     };
 
+    let createdUser;
     try {
-      await axios.post(`${API_URL}/users`, newUser);
+      const response = await axios.post(`${API_URL}/users`, newUser);
+      createdUser = response.data;
     } catch (error) {
       throw new Error("Không thể kết nối đến máy chủ!");
     }
 
-    const userInfo = toUserInfo(newUser);
+    const userInfo = toUserInfo(createdUser);
     storageService.set(STORAGE_KEYS.CURRENT_USER, userInfo);
 
     return userInfo;
