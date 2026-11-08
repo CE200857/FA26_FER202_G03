@@ -9,7 +9,7 @@ const Header = ({ onOpenCart, cartItemCount = 0 }) => {
 
   const handleLogout = () => {
     logout();
-    navigate = "/login";
+    navigate("/login");
   };
 
   return (
@@ -47,7 +47,7 @@ const Header = ({ onOpenCart, cartItemCount = 0 }) => {
             )}
           </Nav>
           <Nav className="align-item-lg-center">
-            {isAdmin && (
+            {isAuthenticated && !isAdmin && (
               <Button
                 variant="outline-light"
                 className="me-lg-2 mb-2 mb-lg-0"
@@ -66,7 +66,7 @@ const Header = ({ onOpenCart, cartItemCount = 0 }) => {
                   Đăng xuất
                 </Button>
               </>
-            ): (
+            ) : (
               <>
                 <Nav.Link as={NavLink} to="/login">
                   Đăng nhập
