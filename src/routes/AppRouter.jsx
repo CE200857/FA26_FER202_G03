@@ -16,6 +16,8 @@ import UserManagement from "../modules/account-management/components/UserManagem
 import VoucherManagementPage from "../modules/voucher-management/pages/VoucherManagementPage";
 import MyVouchersPage from "../modules/voucher-management/pages/MyVouchersPage";
 import ReviewManagementPage from "../modules/review-management/pages/ReviewManagementPage";
+import ReviewModerationPage from '../modules/review-management/components/ReviewModeration';
+import ProductReviewPage from '../modules/review-management/pages/ProductReviewPage';
 
 const PlaceholderPage = ({ title }) => (
   <section style={{ padding: "24px", background: "#fff", borderRadius: "8px" }}>
@@ -28,10 +30,12 @@ const AppRouter = () => {
   const { isAdmin } = useContext(AuthContext);
   return (
     <Routes>
+      {/* KHU VỰC KHÁCH HÀNG (Customer) */}
       <Route element={<CustomerLayout />}>
         <Route path="/" element={<ProductCatalogPage />} />
         <Route path="/products" element={<ProductCatalogPage />} />
         <Route path="/products/:id" element={<ProductDetailPage />} />
+        <Route path="/products/:id/reviews" element={<ProductReviewPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
@@ -61,7 +65,8 @@ const AppRouter = () => {
         </Route>
       </Route>
 
-      <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}>
+      {/* KHU VỰC QUẢN TRỊ (Admin) */}
+      <Route element={<ProtectedRoute allowedRoles={['Admin', 'Customer']} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboardPage />} />
           <Route
@@ -74,7 +79,7 @@ const AppRouter = () => {
           />
           <Route path="users" element={<UserManagement />} />
           <Route path="vouchers" element={<VoucherManagementPage />} />
-          <Route path="reviews" element={<ReviewManagementPage />} />
+          <Route path="reviews" element={<ReviewModerationPage />} />
         </Route>
       </Route>
 
