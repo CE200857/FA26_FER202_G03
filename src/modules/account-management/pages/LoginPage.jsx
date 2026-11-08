@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Container, Form, Button, Alert } from "react-bootstrap";
 import { AuthContext } from "../../../context/AuthContext";
 import { authService } from "../../../services/authService";
 import { validateLogin } from "../../../utils/validation";
@@ -11,6 +12,7 @@ const LoginPage = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,7 +30,9 @@ const LoginPage = () => {
       return;
     }
 
+    setSubmitting(true);
     const result = await login(formData.email.trim(), formData.password);
+    setSubmitting(false);
 
     if (!result.success) {
       setServerError(result.message);
@@ -40,108 +44,58 @@ const LoginPage = () => {
   };
 
   return (
-    <section
-      style={{
-        maxWidth: "420px",
-        margin: "40px auto",
-        padding: "28px",
-        background: "#ffffff",
-        borderRadius: "8px",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
-      }}
-    >
-      <h2 style={{ marginTop: 0, color: "#b56576", textAlign: "center" }}>
-        Đăng nhập
-      </h2>
+    <Container className="my-4" style={{ maxWidth: "420px" }}>
+      <h2 className="mb-4 text-center">Đăng nhập</h2>
 
-      {serverError && (
-        <div
-          style={{
-            padding: "10px 12px",
-            marginBottom: "16px",
-            borderRadius: "6px",
-            backgroundColor: "#f8d7da",
-            color: "#842029",
-            fontSize: "14px",
-          }}
-        >
-          {serverError}
-        </div>
-      )}
+      {serverError && <Alert variant="danger">{serverError}</Alert>}
 
-      <form onSubmit={handleSubmit} noValidate>
-        <div style={{ marginBottom: "16px" }}>
-          <label htmlFor="email" style={{ display: "block", marginBottom: "6px" }}>
-            Email
-          </label>
-          <input
-            id="email"
+      <Form noValidate onSubmit={handleSubmit}>
+        <Form.Group className="mb-3" controlId="email">
+          <Form.Label>Email</Form.Label>
+          <Form.Control
             type="email"
             name="email"
+            placeholder="Nhập email"
             value={formData.email}
             onChange={handleChange}
-            placeholder="Nhập email"
-            style={{
-              width: "100%",
-              padding: "10px",
-              borderRadius: "6px",
-              border: errors.email ? "1px solid #dc3545" : "1px solid #ccc",
-              boxSizing: "border-box",
-            }}
+            isInvalid={!!errors.email}
+            autoComplete="email"
           />
-          {errors.email && (
-            <small style={{ color: "#dc3545" }}>{errors.email}</small>
-          )}
-        </div>
+          <Form.Control.Feedback type="invalid">
+            {errors.email}
+          </Form.Control.Feedback>
+        </Form.Group>
 
-        <div style={{ marginBottom: "20px" }}>
-          <label htmlFor="password" style={{ display: "block", marginBottom: "6px" }}>
-            Mật khẩu
-          </label>
-          <input
-            id="password"
+        <Form.Group className="mb-4" controlId="password">
+          <Form.Label>Mật khẩu</Form.Label>
+          <Form.Control
             type="password"
             name="password"
+            placeholder="Nhập mật khẩu"
             value={formData.password}
             onChange={handleChange}
-            placeholder="Nhập mật khẩu"
-            style={{
-              width: "100%",
-              padding: "10px",
-              borderRadius: "6px",
-              border: errors.password ? "1px solid #dc3545" : "1px solid #ccc",
-              boxSizing: "border-box",
-            }}
+            isInvalid={!!errors.password}
+            autoComplete="current-password"
           />
-          {errors.password && (
-            <small style={{ color: "#dc3545" }}>{errors.password}</small>
-          )}
-        </div>
+          <Form.Control.Feedback type="invalid">
+            {errors.password}
+          </Form.Control.Feedback>
+        </Form.Group>
 
-        <button
+        <Button
           type="submit"
-          style={{
-            width: "100%",
-            padding: "11px",
-            borderRadius: "6px",
-            border: "none",
-            backgroundColor: "#b56576",
-            color: "#ffffff",
-            fontWeight: "600",
-            cursor: "pointer",
-          }}
+          variant="success"
+          className="w-100"
+          disabled={submitting}
         >
-          Đăng nhập
-        </button>
-      </form>
+          {submitting ? "Đang đăng nhập..." : "Đăng nhập"}
+        </Button>
+      </Form>
 
-      <p style={{ textAlign: "center", marginBottom: 0, marginTop: "16px" }}>
-        Chưa có tài khoản?{" "}
-        <Link to="/register" style={{ color: "#b56576", fontWeight: "600" }}>
-          Đăng ký
-        </Link>
+      <p className="text-center mt-3 mb-0">
+        Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
       </p>
-    </section>
+    </Container>
   );
 };
 

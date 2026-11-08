@@ -1,8 +1,9 @@
-import React, { useState, useContext, useEffect, use } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Container, Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
 import { userService } from "../../../services/userService";
+import { validateProfile } from "../../../utils/validation";
 
 const UpdateProfilePage = () => {
   const { user, updateUser } = useContext(AuthContext);
@@ -14,35 +15,30 @@ const UpdateProfilePage = () => {
   const [submit, setSubmit] = useState(false);
 
   useEffect(() => {
-    let ignore = false;
-    const loadProfile = async () => {
-      try {
-        const data = user ? await userService.getUserById(user.id) : null;
-        if (!ignore) {
-          setProfile(data);
-          setName(data ? String(data.name || "") : "");
-          setPhone(data ? String(data.phone || "") : "");
-        }
-      } catch (error) {
-        if (!ignore) {
-          alert(error.message);
-        }
-      } finally {
-        if (!ignore) {
-          setLoading(false);
-        }
-      }
-    };
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-    loadProfile();
-
-    return () => {
-      ignore = true;
-    };
+    userService
+      .getUserById(user.id)
+      .then((data) => {
+        setProfile(data);
+        if (data) {
+          setName(data.name);
+          setPhone(data.phone);
+        }
+        setLoading(false);
+      })
+      .catch((error) => {
+        alert(error.message);
+        setLoading(false);
+      });
   }, [user]);
 
-  const validName = name.trim() !== "";
-  const validPhone = phone.trim() === "" || /^0\d{9}$/.test(phone.trim());
+  const profileErrors = validateProfile({name, phone});
+  const validName = !profileErrors.name;
+  const validPhone = !profileErrors.phone;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -112,7 +108,7 @@ const UpdateProfilePage = () => {
             isValid={submit && validName}
           />
           <Form.Control.Feedback type="invalid">
-            Vui lòng nhập họ tên.
+            {profileErrors.name}
           </Form.Control.Feedback>
         </Form.Group>
         <Form.Group className="mb-3" controlId="profilePhone">
@@ -127,7 +123,7 @@ const UpdateProfilePage = () => {
             autoComplete="tel"
           />
           <Form.Control.Feedback type="invalid">
-            Số điện thoại phải gồm 10 chữ số, bắt đầu bằng 0.
+            {profileErrors.phone}
           </Form.Control.Feedback>
         </Form.Group>
 

@@ -15,24 +15,28 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
-    try {
-      const loggedInUser = await authService.login(email, password);
-      setUser(loggedInUser);
-      return { success: true };
-    } catch (error) {
-      return { success: false, message: error.message };
-    }
+  const login = (email, password) => {
+    return authService
+      .login(email, password)
+      .then((loggedInUser) => {
+        setUser(loggedInUser);
+        return { success: true };
+      })
+      .catch((error) => {
+        return { success: false, message: error.message };
+      });
   };
 
-  const register = async (userData) => {
-    try {
-      const newUser = await authService.register(userData);
-      setUser(newUser);
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
+  const register = (userData) => {
+    return authService
+      .register(userData)
+      .then((newUser) => {
+        setUser(newUser);
+        return { success: true };
+      })
+      .catch((error) => {
+        return { success: false, message: error.message };
+      });
   };
 
   const logout = () => {
@@ -40,8 +44,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const updateUser = (updateUser) => {
-    setUser(updateUser);
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
   };
 
   const contextValue = {

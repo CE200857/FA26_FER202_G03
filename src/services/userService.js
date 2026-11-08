@@ -1,79 +1,70 @@
 import { STORAGE_KEYS, storageService } from "./storageService";
-import axios from "axios";
-
 const API_URL = "http://localhost:5001";
-
-const handleApiError = (error) => {
-  if (error.response && error.response.status === 404) {
-    throw new Error("Không tìm thấy người dùng!");
-  }
-  throw new Error("Không thể kết nối đến máy chủ!");
-};
 
 const getUsers = () => storageService.get(STORAGE_KEYS.USERS, []);
 
 export const userService = {
-  getUserById: async (id) => {
-    try {
-      const response = await axios.get(`${API_URL}/users/${id}`);
-      const found = response.data;
-      return {
-        id: found.i,
-        name: found.name,
-        email: found.email,
-        role: found.role,
-        phone: found.phone || "",
-        status: found.status,
-      };
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        return null;
-      }
-      handleApiError(error);
-    }
-  },
+  getUserById: (id) => {
+    return fetch(`${API_URL}/users?id=${id}`)
+      .then((res) => res.json())
+      .then((users) => {
+        const found = users[0];
 
-  updateProfile: async (id, { name, phone }) => {
-    try {
-      const response = await axios.patch(`${API_URL}/users/${id}`, {
-        name,
-        phone,
+        if (!found) {
+          return null;
+        }
+
+        return {
+          id: found.id,
+          name: found.name,
+          email: found.email,
+          role: found.role,
+          phone: found.phone || "",
+          status: found.status,
+        };
       });
-
-      const target = response.data;
-
-      const userInfo = {
-        id: target.id,
-        name: target.name,
-        email: target.email,
-        role: target.role,
-      };
-      storageService.set(STORAGE_KEYS.CURRENT_USER, userInfo);
-      return userInfo;
-    } catch (error) {
-      handleApiError(error);
-    }
   },
 
-  changePassword: async (id, oldPassword, newPassword) => {
-    let target;
-    try{
-      const response = await axios.get(`${API_URL}/users/${id}`);
-      target = response.data;
-    }catch (error){
-      handleApiError(error);
-    }
+  updateProfile: (id, { name, phone }) => {
+    return fetch(`${API_URL}/users/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, phone }),
+    })
+      .then((res) => res.json())
+      .then((target) => {
+        const userInfo = {
+          id: target.id,
+          name: target.name,
+          email: target.email,
+          role: target.role,
+        };
+        storageService.set(STORAGE_KEYS.CURRENT_USER, userInfo);
 
-    if(target.password !== oldPassword){
-      throw new Error("Mật khẩu hiện tại không chính xác!");
-    }
+        return userInfo;
+      });
+  },
 
-    try{
-      await axios.patch(`${API_URL}/users/${id}`, {password: newPassword});
-    }catch(error){
-      handleApiError(error);
-    }
-    return true;
+  changePassword: (id, oldPassword, newPassword) => {
+    return fetch(`${API_URL}/users?id=${id}`)
+      .then((res) => res.json())
+      .then((users) => {
+        const target = users[0];
+
+        if (!target) {
+          throw new Error("Không tìm thấy người dùng!");
+        }
+        if (target.password !== oldPassword) {
+          throw new Error("Mật khẩu hiện tại không chính xác!");
+        }
+
+        return fetch(`${API_URL}/users/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: newPassword }),
+        });
+      })
+      .then(() => true);
   },
 
   getAllUsers: () =>
@@ -166,6 +157,7 @@ export const userService = {
     const updatedUsers = users.map((u) =>
       u.id === id ? { ...u, status: newStatus } : u,
     );
+
     storageService.set(STORAGE_KEYS.USERS, updatedUsers);
 
     return newStatus;

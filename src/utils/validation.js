@@ -5,7 +5,7 @@ export const validateLogin = ({ email, password }) => {
   const errors = {};
 
   if (!email.trim()) {
-    errors.email = "Vui lòng nhập email";
+    error.email = "Vui lòng nhập email";
   } else if (!EMAIL_REGEX.test(email.trim())) {
     errors.email = "Email không hợp lệ";
   }
@@ -17,19 +17,22 @@ export const validateLogin = ({ email, password }) => {
   return errors;
 };
 
-export const validateRegister = ({ name, email, password, confirmPassword }) => {
+export const validateRegister = ({
+  name,
+  email,
+  password,
+  confirmPassword,
+}) => {
   const errors = {};
 
   if (!name.trim()) {
     errors.name = "Vui lòng nhập họ tên";
   }
-
   if (!email.trim()) {
     errors.email = "Vui lòng nhập email";
   } else if (!EMAIL_REGEX.test(email.trim())) {
     errors.email = "Email không hợp lệ";
   }
-
   if (!password) {
     errors.password = "Vui lòng nhập mật khẩu";
   } else if (password.length < 6) {
@@ -41,11 +44,10 @@ export const validateRegister = ({ name, email, password, confirmPassword }) => 
   } else if (confirmPassword !== password) {
     errors.confirmPassword = "Mật khẩu xác nhận không khớp";
   }
-
   return errors;
 };
 
-export const validateProfile = ({ name, phone }) => {
+export const validateProfile = ({name, phone}) => {
   const errors = {};
 
   if (!name.trim()) {
@@ -59,14 +61,10 @@ export const validateProfile = ({ name, phone }) => {
   return errors;
 };
 
-export const validateChangePassword = ({
-  oldPassword,
-  newPassword,
-  confirmPassword,
-}) => {
-  const errors = {};
+export const validateChangePassword = ({oldPassword, newPassword, confirmPassword}) => {
+  const errors ={};
 
-  if (!oldPassword) {
+  if(!oldPassword){
     errors.oldPassword = "Vui lòng nhập mật khẩu hiện tại";
   }
 
@@ -87,6 +85,38 @@ export const validateChangePassword = ({
   return errors;
 };
 
+export const validateUserForm = ({name, email, password, phone, role}, isEdit = false) => {
+  const errors = {};
+
+  if (!name.trim()) {
+    errors.name = "Vui lòng nhập họ tên";
+  }
+
+  if (!isEdit) {
+    if (!email.trim()) {
+      errors.email = "Vui lòng nhập email";
+    } else if (!EMAIL_REGEX.test(email.trim())) {
+      errors.email = "Email không hợp lệ";
+    }
+
+    if (!password) {
+      errors.password = "Vui lòng nhập mật khẩu";
+    } else if (password.length < 6) {
+      errors.password = "Mật khẩu phải có ít nhất 6 ký tự";
+    }
+  }
+
+  if (phone.trim() && !PHONE_REGEX.test(phone.trim())) {
+    errors.phone = "Số điện thoại phải gồm 10 chữ số, bắt đầu bằng 0";
+  }
+
+  if (role !== "Admin" && role !== "Customer") {
+    errors.role = "Vai trò không hợp lệ";
+  }
+
+  return errors;
+};
+
 /**
  * Validate dữ liệu form đánh giá (Review)
  * @param {Object} data - { rating, comment }
@@ -96,19 +126,19 @@ export const validateReview = ({ rating, comment }) => {
   const errors = {};
 
   // Kiểm tra số sao (rating)
-  if (!rating || typeof rating !== 'number') {
-    errors.rating = 'Vui lòng chọn số sao đánh giá.';
+  if (!rating || typeof rating !== "number") {
+    errors.rating = "Vui lòng chọn số sao đánh giá.";
   } else if (rating < 1 || rating > 5) {
-    errors.rating = 'Số sao đánh giá phải từ 1 đến 5 sao.';
+    errors.rating = "Số sao đánh giá phải từ 1 đến 5 sao.";
   }
 
   // Kiểm tra nội dung nhận xét (comment)
   if (!comment || !comment.trim()) {
-    errors.comment = 'Vui lòng nhập nội dung đánh giá.';
+    errors.comment = "Vui lòng nhập nội dung đánh giá.";
   } else if (comment.trim().length < 5) {
-    errors.comment = 'Nội dung đánh giá phải có ít nhất 5 ký tự.';
+    errors.comment = "Nội dung đánh giá phải có ít nhất 5 ký tự.";
   } else if (comment.trim().length > 1000) {
-    errors.comment = 'Nội dung đánh giá không được vượt quá 1000 ký tự.';
+    errors.comment = "Nội dung đánh giá không được vượt quá 1000 ký tự.";
   }
 
   return {
@@ -122,41 +152,6 @@ export const validateReview = ({ rating, comment }) => {
  */
 export const isNotEmpty = (value) => {
   if (value === null || value === undefined) return false;
-  if (typeof value === 'string') return value.trim().length > 0;
+  if (typeof value === "string") return value.trim().length > 0;
   return true;
-};
-
-export const validateUserForm = (
-  { name, email, password, phone, role },
-  isEdit = false,
-) => {
-  const errors = {};
-
-  if (!name.trim()) {
-    errors.name = "Vui lòng nhập họ tên";
-  }
-
-  if (!isEdit) {
-    if (!email.trim()) {
-      errors.email = "Vui lòng nhập email";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      errors.email = "Email không hợp lệ";
-    }
-
-    if (!password) {
-      errors.password = "Vui lòng nhập mật khẩu";
-    } else if (password.length < 6) {
-      errors.password = "Mật khẩu phải có ít nhất 6 ký tự";
-    }
-  }
-
-  if (phone.trim() && !/^0\d{9}$/.test(phone.trim())) {
-    errors.phone = "Số điện thoại phải gồm 10 chữ số, bắt đầu bằng 0";
-  }
-
-  if (!["Admin", "Customer"].includes(role)) {
-    errors.role = "Vai trò không hợp lệ";
-  }
-
-  return errors;
 };
