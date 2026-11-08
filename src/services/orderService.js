@@ -3,6 +3,53 @@ import axios from 'axios';
 const api = axios.create({ baseURL: 'http://localhost:5001', timeout: 10000 });
 
 export const orderService = {
+
+    async getAllOrders() {
+        const response = await api.get('/orders');
+        const orders = response.data;
+        if (!Array.isArray(orders)) {
+            throw new Error('Dữ liệu đơn hàng không hợp lệ.');
+        }
+        return [...orders].sort((a, b) => {
+            const timeA = Date.parse(a.createdAt) || 0;
+            const timeB = Date.parse(b.createdAt) || 0;
+            return timeB - timeA;
+        });
+    },
+
+    async updateOrderStatus(orderId, nextStatus) {
+        const id = String(orderId ?? '').trim();
+        if (!id) {
+            throw new Error('Mã đơn hàng không hợp lệ.');
+        }
+        const transitions = {
+            Pending: ['Shipping', 'Cancelled'],
+            Shipping: ['Completed'],
+            Completed: [],
+            Cancelled: [],
+        };
+        if (!Object.hasOwn(transitions, nextStatus)) {
+            throw new Error('Trạng thái đơn hàng không hợp lệ.');
+        }
+
+        const endpoint = `/orders/${encodeURIComponent(id)}`;
+        const response = await api.get(endpoint);
+        const order = response.data;
+        if (!order || typeof order !== 'object' || Array.isArray(order)) {
+            throw new Error('Dữ liệu đơn hàng không hợp lệ.');
+        }
+        if (order.status === nextStatus) {
+            return order;
+        }
+        const allowedStatuses = transitions[order.status];
+        if (!Array.isArray(allowedStatuses) || !allowedStatuses.includes(nextStatus)) {
+            throw new Error('Không thể chuyển trạng thái đơn hàng. Vui lòng tải lại danh sách.');
+        }
+
+        const updatedResponse = await api.patch(endpoint, { status: nextStatus });
+        return updatedResponse.data;
+    },
+
     async getOrdersByUser(userId) {
         if (userId == null || String(userId).trim() === '') {
             return [];
