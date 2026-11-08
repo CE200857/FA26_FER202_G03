@@ -1,160 +1,163 @@
-import React, { useState } from 'react';
+// src/modules/review-management/pages/ReviewModerationPage.jsx
+import React, { useEffect, useState, useCallback } from 'react';
+import { reviewService } from '../../../services/reviewService';
 
-/**
- * Component ReviewModeration - Kiểm duyệt đánh giá dành cho Admin / Moderator
- * @param {Array} reviews - Danh sách các đánh giá
- * @param {Function} onUpdateStatus - Hàm cập nhật trạng thái (approved, rejected, pending)
- * @param {Function} onDeleteReview - Hàm xóa đánh giá
- */
-const ReviewModeration = ({ reviews = [], onUpdateStatus, onDeleteReview }) => {
-  const [filterStatus, setFilterStatus] = useState('all');
+const ReviewModerationPage = () => {
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Lọc danh sách theo trạng thái và từ khóa tìm kiếm
-  const filteredReviews = reviews.filter((review) => {
-    const matchesStatus =
-      filterStatus === 'all' || review.status === filterStatus;
-    const matchesSearch =
-      (review.userName && review.userName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (review.comment && review.comment.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (review.productName && review.productName.toLowerCase().includes(searchTerm.toLowerCase()));
-    return matchesStatus && matchesSearch;
-  });
+  const fetchAllReviews = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await reviewService.getAllReviewsForAdmin();
+      setReviews(data || []);
+    } catch (error) {
+      console.error("Lỗi khi kết nối API reviews:", error);
+      setReviews([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  // Badge trạng thái
-  const renderStatusBadge = (status) => {
-    switch (status) {
-      case 'approved':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            Đã duyệt
-          </span>
-        );
-      case 'rejected':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-            Đã ẩn / Từ chối
-          </span>
-        );
-      case 'pending':
-      default:
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-            Chờ duyệt
-          </span>
-        );
+  useEffect(() => {
+    fetchAllReviews();
+  }, [fetchAllReviews]);
+
+  const handleModerate = async (reviewId, newStatus) => {
+    try {
+      await reviewService.moderateReview(reviewId, newStatus);
+      fetchAllReviews();
+    } catch (error) {
+      alert("Lỗi duyệt bài: " + (error.message || error));
     }
   };
 
+  const handleDelete = async (reviewId) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa hẳn đánh giá này?")) {
+      try {
+        await reviewService.deleteReview(reviewId, null, true);
+        fetchAllReviews();
+      } catch (error) {
+        alert("Lỗi xóa bài: " + (error.message || error));
+      }
+    }
+  };
+
+  const displayedReviews = reviews.filter((review) => {
+    const currentStatus = review.status || 'pending';
+    const matchesStatus = statusFilter === 'all' || currentStatus === statusFilter;
+    const matchesSearch =
+      (review.userName && review.userName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (review.comment && review.comment.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (review.productId && String(review.productId).toLowerCase().includes(searchTerm.toLowerCase()));
+
+    return matchesStatus && matchesSearch;
+  });
+
   return (
-    <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
-      {/* Header & Filter Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div className="review-moderation-page p-4 bg-white rounded-3 shadow-sm border">
+      <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-800">Quản lý & Kiểm duyệt Đánh giá</h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Tổng số đánh giá: <span className="font-semibold text-gray-700">{reviews.length}</span>
-          </p>
+          <h4 className="fw-bold text-dark mb-1">Quản lý & Kiểm duyệt Đánh giá (Admin)</h4>
+          <span className="text-muted small">
+            Tổng số: <strong>{reviews.length}</strong> đánh giá
+          </span>
         </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Ô tìm kiếm */}
-          <input
-            type="text"
-            placeholder="Tìm theo tên, nội dung..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-
-          {/* Lọc theo trạng thái */}
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">Tất cả trạng thái</option>
-            <option value="pending">Chờ duyệt</option>
-            <option value="approved">Đã duyệt</option>
-            <option value="rejected">Đã ẩn / Từ chối</option>
-          </select>
-        </div>
+        <input
+          type="text"
+          placeholder="Tìm theo tên, nội dung, ID sản phẩm..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="form-control form-control-sm"
+          style={{ maxWidth: '280px' }}
+        />
       </div>
 
-      {/* Bảng danh sách đánh giá */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse text-sm">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-200 text-gray-600 font-semibold">
-              <th className="py-3 px-4">Người dùng</th>
-              <th className="py-3 px-4">Sản phẩm</th>
-              <th className="py-3 px-4">Số sao</th>
-              <th className="py-3 px-4">Nội dung đánh giá</th>
-              <th className="py-3 px-4">Trạng thái</th>
-              <th className="py-3 px-4">Ngày gửi</th>
-              <th className="py-3 px-4 text-right">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {filteredReviews.length === 0 ? (
+      <div className="mb-4 border-bottom pb-3 d-flex gap-2 flex-wrap">
+        {[
+          { key: 'all', label: 'Tất cả' },
+          { key: 'pending', label: 'Chờ duyệt' },
+          { key: 'approved', label: 'Đã duyệt' },
+          { key: 'rejected', label: 'Đã từ chối / Ẩn' },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setStatusFilter(tab.key)}
+            className={`btn btn-sm rounded-pill ${
+              statusFilter === tab.key ? 'btn-primary' : 'btn-outline-secondary'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {loading ? (
+        <div className="text-center py-4 text-muted">Đang tải dữ liệu...</div>
+      ) : (
+        <div className="table-responsive">
+          <table className="table table-hover align-middle border text-sm">
+            <thead className="table-light">
               <tr>
-                <td colSpan="7" className="py-8 text-center text-gray-500">
-                  Không tìm thấy đánh giá nào phù hợp.
-                </td>
+                <th>Người dùng</th>
+                <th>Sản phẩm (ID)</th>
+                <th className="text-center">Sao</th>
+                <th>Nội dung nhận xét</th>
+                <th className="text-center">Trạng thái</th>
+                <th className="text-center">Hành động</th>
               </tr>
-            ) : (
-              filteredReviews.map((review) => (
-                <tr key={review.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="py-3 px-4 font-medium text-gray-900">
-                    {review.userName || 'Khách hàng'}
-                  </td>
-                  <td className="py-3 px-4 text-gray-600 max-w-[150px] truncate">
-                    {review.productName || `#${review.productId}`}
-                  </td>
-                  <td className="py-3 px-4 text-yellow-500 font-bold">
-                    {review.rating} ★
-                  </td>
-                  <td className="py-3 px-4 text-gray-700 max-w-xs truncate" title={review.comment}>
-                    {review.comment}
-                  </td>
-                  <td className="py-3 px-4">
-                    {renderStatusBadge(review.status)}
-                  </td>
-                  <td className="py-3 px-4 text-gray-500 text-xs">
-                    {review.createdAt ? new Date(review.createdAt).toLocaleDateString('vi-VN') : '—'}
-                  </td>
-                  <td className="py-3 px-4 text-right space-x-2">
-                    {review.status !== 'approved' && (
-                      <button
-                        onClick={() => onUpdateStatus && onUpdateStatus(review.id, 'approved')}
-                        className="px-2.5 py-1 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-700 transition"
-                      >
-                        Duyệt
-                      </button>
-                    )}
-                    {review.status !== 'rejected' && (
-                      <button
-                        onClick={() => onUpdateStatus && onUpdateStatus(review.id, 'rejected')}
-                        className="px-2.5 py-1 text-xs font-medium bg-amber-500 text-white rounded hover:bg-amber-600 transition"
-                      >
-                        Ẩn
-                      </button>
-                    )}
-                    <button
-                      onClick={() => onDeleteReview && onDeleteReview(review.id)}
-                      className="px-2.5 py-1 text-xs font-medium bg-red-600 text-white rounded hover:bg-red-700 transition"
-                    >
-                      Xóa
-                    </button>
+            </thead>
+            <tbody>
+              {displayedReviews.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-4 text-muted fs-6 italic">
+                    Không tìm thấy đánh giá nào trong danh mục này.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                displayedReviews.map((review) => (
+                  <tr key={review.id}>
+                    <td className="fw-bold text-dark">{review.userName || 'Khách hàng'}</td>
+                    <td className="text-secondary">{review.productId}</td>
+                    <td className="text-center text-warning fw-bold">{review.rating} ★</td>
+                    <td className="text-secondary" style={{ maxWidth: '300px' }}>{review.comment}</td>
+                    <td className="text-center">
+                      <span className={`badge ${
+                        review.status === 'approved' ? 'bg-success' :
+                        review.status === 'rejected' ? 'bg-danger' : 'bg-warning text-dark'
+                      }`}>
+                        {review.status === 'approved' ? 'Đã duyệt' :
+                         review.status === 'rejected' ? 'Đã ẩn' : 'Chờ duyệt'}
+                      </span>
+                    </td>
+                    <td className="text-center">
+                      <div className="btn-group btn-group-sm">
+                        {review.status !== 'approved' && (
+                          <button onClick={() => handleModerate(review.id, 'approved')} className="btn btn-outline-success">
+                            Duyệt
+                          </button>
+                        )}
+                        {review.status !== 'rejected' && (
+                          <button onClick={() => handleModerate(review.id, 'rejected')} className="btn btn-outline-warning text-dark">
+                            Ẩn
+                          </button>
+                        )}
+                        <button onClick={() => handleDelete(review.id)} className="btn btn-outline-danger">
+                          Xóa
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
 
-export default ReviewModeration;
+export default ReviewModerationPage;
