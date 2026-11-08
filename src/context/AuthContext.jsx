@@ -31,17 +31,17 @@ export const AuthProvider = ({ children }) => {
       setUser(newUser);
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, message: error.message };
     }
   };
 
   const logout = () => {
-    authService.logout;
+    authService.logout();
     setUser(null);
   };
 
-  const updateUser = (updateUser) => {
-    setUser(updateUser);
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
   };
 
   const contextValue = {

@@ -18,7 +18,7 @@ export const userService = {
       const response = await axios.get(`${API_URL}/users/${id}`);
       const found = response.data;
       return {
-        id: found.i,
+        id: found.id,
         name: found.name,
         email: found.email,
         role: found.role,
