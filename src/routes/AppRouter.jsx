@@ -18,6 +18,7 @@ import MyVouchersPage from '../modules/voucher-management/pages/MyVouchersPage';
 import ReviewManagementPage from '../modules/review-management/pages/ReviewManagementPage';
 import OrderHistoryPage from '../modules/cart-order/pages/OrderHistoryPage';
 import CheckoutPage from '../modules/cart-order/pages/CheckoutPage';
+import OrderManagement from '../modules/cart-order/components/OrderManagement';
 import ProductReviewPage from "../modules/review-management/pages/ProductReviewPage";
 
 const PlaceholderPage = ({ title }) => (
@@ -59,7 +60,7 @@ const AppRouter = () => {
                 <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<AdminDashboardPage />} />
                     <Route path="products" element={<PlaceholderPage title="Quản lý sản phẩm" />} />
-                    <Route path="orders" element={<PlaceholderPage title="Quản lý đơn hàng" />} />
+                    <Route path="orders" element={<OrderManagement />} />
                     <Route path="users" element={<UserManagement />} />
                     <Route path="vouchers" element={<VoucherManagementPage />} />
                     <Route path="reviews" element={<ReviewManagementPage />} />
