@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getProducts } from '../../../services/productService';
-import { STORAGE_KEYS, storageService } from '../../../services/storageService';
+import { request } from '../../../services/api';
 import { formatCurrency } from '../../../utils/formatCurrency';
 import {
   ORDER_STATUSES,
@@ -36,13 +36,18 @@ export default function AdminDashboardPage() {
     setStatus('loading');
     try {
       const products = await getProducts({ includeHidden: true });
-      // Orders and reviews belong to other modules: read-only here.
-      const orders = storageService.get(STORAGE_KEYS.ORDERS, []);
-      const reviews = storageService.get(STORAGE_KEYS.REVIEWS, []);
+      const [orders, reviews] = await Promise.all([
+        request('/orders'),
+        request('/reviews'),
+      ]);
+      const reviewList = reviews.map((review) => ({
+        ...review,
+        isHidden: review.status !== 'approved',
+      }));
       setData({
         inventory: summarizeInventory(products),
         orders: summarizeOrders(orders),
-        reviews: summarizeReviews(reviews),
+        reviews: summarizeReviews(reviewList),
       });
       setStatus('ready');
     } catch {
@@ -56,7 +61,7 @@ export default function AdminDashboardPage() {
 
   if (status === 'loading') {
     return (
-      <section className="pm-page" aria-busy="true">
+      <section className="pm-page pm-page--admin" aria-busy="true">
         <div className="pm-state">
           <p>Đang tải số liệu tổng quan...</p>
         </div>
@@ -66,7 +71,7 @@ export default function AdminDashboardPage() {
 
   if (status === 'error') {
     return (
-      <section className="pm-page">
+      <section className="pm-page pm-page--admin">
         <div className="pm-state" role="alert">
           <p>Không tải được số liệu tổng quan.</p>
           <button type="button" className="pm-btn pm-btn--inline" onClick={loadData}>
@@ -81,7 +86,7 @@ export default function AdminDashboardPage() {
   const maxStatusCount = Math.max(1, ...Object.values(orders.byStatus));
 
   return (
-    <section className="pm-page pm-dash">
+    <section className="pm-page pm-page--admin pm-dash">
       <section aria-labelledby="dash-products">
         <div className="pm-dash__heading">
           <h2 id="dash-products">Sản phẩm và tồn kho</h2>
