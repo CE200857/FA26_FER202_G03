@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useCart } from '../../../context/CartContext';
 import { getProductById } from '../../../services/productService';
@@ -8,13 +8,14 @@ import '../product-management.css';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
-  const { cartItems, addToCart } = useCart();
+  const { cartItems, addToCar, isLoading, isUpdating } = useCart();
 
   const [product, setProduct] = useState(null);
   const [status, setStatus] = useState('loading'); // 'loading' | 'error' | 'notFound' | 'ready'
   const [quantity, setQuantity] = useState(1);
   const [imageFailed, setImageFailed] = useState(false);
   const [addedQuantity, setAddedQuantity] = useState(0);
+  const addRequest = useRef(0);
 
   const loadProduct = useCallback(async () => {
     setStatus('loading');
@@ -32,6 +33,9 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     loadProduct();
+    return () => {
+      addRequest.current += 1;
+    };
   }, [loadProduct]);
 
   if (status === 'loading') {
@@ -81,12 +85,17 @@ export default function ProductDetailPage() {
     setQuantity(Math.min(Math.max(1, Math.floor(value)), Math.max(1, remaining)));
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (safeQuantity === 0) return;
-    // TODO: once the Account module is merged, show the login popup for guests here.
-    addToCart(product, safeQuantity);
-    setAddedQuantity(safeQuantity);
-    setQuantity(1);
+
+    const requestId = ++addRequest.current;
+    setAddedQuantity(0);
+    const success = await addToCart(product, safeQuantity);
+
+    if (success && requestId === addRequest.current) {
+      setAddedQuantity(safeQuantity);
+      setQuantity(1);
+    }
   };
 
   let buttonText = 'Thêm vào giỏ';
@@ -167,7 +176,7 @@ export default function ProductDetailPage() {
           <button
             type="button"
             className="pm-btn pm-btn--detail"
-            disabled={remaining === 0}
+            disabled={remaining === 0 || isLoading || isUpdating}
             onClick={handleAddToCart}
           >
             {buttonText}
