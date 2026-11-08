@@ -1,49 +1,31 @@
+import axios from "axios";
 import { STORAGE_KEYS, storageService } from "./storageService";
-import { initialUsers } from "../data/mockData";
 
-const getUsers = () => {
-  let users = storageService.get(STORAGE_KEYS.USERS, []);
-  let needSave = false;
+const API_URL = "http://localhost:5001";
 
-  if(users.length === 0){
-    users = initialUsers.map((user) => ({...users}));
-    needSave = true;
+const getUsersByEmail = async (email) => {
+  try {
+    const response = await axios.get(`${API_URL}/users`, {
+      params: { email },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error("Không thể kết nối đến máy chủ!");
   }
-
-  users.forEach((user) => {
-    if(
-      user.status === undefined || 
-      user.status === null || 
-      user.status === ""
-    ) {
-      const initialUser = initialUsers.find(
-        (item) => item.email === user.email
-      );
-
-      user.status = initialUser ? initialUser.status : "active";
-
-      needSave = true;
-    }
-  });
-
-  if(needSave) {
-    const saved = storageService.set(STORAGE_KEYS.USERS, users);
-
-    if(!saved){
-      throw new Error("Cannot update account database, Please check localStorage");
-    }
-  }
-
-  return users;
 };
 
-export const authService = {
-  login: (email, password) => {
-    const users = getUsers();
+const toUserInfo = (user) => ({
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+});
 
-    const user = users.find(
-      (u) => u.email === email && u.password === password,
-    );
+export const authService = {
+  login: async (email, password) => {
+    const users = await getUsersByEmail(email);
+
+    const user = user.find((u) => u.password === password);
 
     if (!user) {
       throw new Error("Email hoặc mật khẩu không chính xác!");
@@ -52,22 +34,16 @@ export const authService = {
       throw new Error("Tài khoản của bạn đã bị khóa bởi quản trị viên!");
     }
 
-    const userInfo = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    };
+    const userInfo = toUserInfo(user);
     storageService.set(STORAGE_KEYS.CURRENT_USER, userInfo);
 
     return userInfo;
   },
 
-  register: (userData) => {
-    const users = getUsers();
+  register: async (userData) => {
+    const users = await getUsersByEmail(userData.email);
 
-    const isEmailExist = users.some((u) => u.email === userData.email);
-    if (isEmailExist) {
+    if (users.length > 0) {
       throw new Error("Email này đã được sử dụng!");
     }
 
@@ -76,18 +52,18 @@ export const authService = {
       name: userData.name,
       email: userData.email,
       password: userData.password,
+      phone: "",
       role: "Customer",
       status: "active",
     };
 
-    storageService.set(STORAGE_KEYS.USERS, [...users, newUser]);
+    try {
+      await axios.post(`${API_URL}/users`, newUser);
+    } catch (error) {
+      throw new Error("Không thể kết nối đến máy chủ!");
+    }
 
-    const userInfo = {
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-    };
+    const userInfo = toUserInfo(newUser);
     storageService.set(STORAGE_KEYS.CURRENT_USER, userInfo);
 
     return userInfo;
