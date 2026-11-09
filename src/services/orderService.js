@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { voucherService } from './voucherService';
 
 const api = axios.create({ baseURL: 'http://localhost:5001', timeout: 10000 });
 
@@ -98,7 +99,14 @@ export const orderService = {
         });
     },
 
-    async createOrder({ userId, recipientName, phone, shippingAddress, expectedItems }) {
+    async createOrder({
+        userId,
+        recipientName,
+        phone,
+        shippingAddress,
+        expectedItems,
+        voucherCode = null
+    }) {
         const ownerId = String(userId ?? '').trim();
         const receiver = String(recipientName ?? '').trim();
         const address = String(shippingAddress ?? '').trim();
@@ -186,6 +194,26 @@ export const orderService = {
         if (!Number.isFinite(subtotal)) {
             throw new Error('Tổng tiền đơn hàng không hợp lệ.');
         }
+
+        let appliedVoucher = null;
+        let discountAmount = 0;
+        let finalAmount = subtotal;
+
+        if (voucherCode) {
+            const validation = await voucherService.validateVoucher(
+                voucherCode,
+                subtotal
+            );
+
+            if (!validation.isValid) {
+                throw new Error(validation.message);
+            }
+
+            appliedVoucher = validation.voucher;
+            discountAmount = validation.discountAmount;
+            finalAmount = validation.finalAmount;
+        }
+
         const newOrder = {
             userId: ownerId,
             recipientName: receiver,
@@ -193,13 +221,30 @@ export const orderService = {
             shippingAddress: address,
             items,
             subtotal,
-            discountAmount: 0,
-            totalAmount: subtotal,
-            voucherCode: null,
+            discountAmount,
+            totalAmount: finalAmount,
+            voucherCode: appliedVoucher?.code ?? null,
             status: 'Pending',
             createdAt: new Date().toISOString(),
         };
         const response = await api.post('/orders', newOrder);
-        return response.data;
+
+        let voucherUsageUpdateFailed = false;
+
+        if (appliedVoucher) {
+            try {
+                await voucherService.incrementUsedCount(appliedVoucher.id);
+            } catch (error) {
+                // Đơn hàng đã tạo thành công.
+                // Không báo lỗi tạo đơn để tránh khách đặt lại đơn hàng.
+                console.error('Không thể cập nhật lượt sử dụng voucher:', error);
+                voucherUsageUpdateFailed = true;
+            }
+        }
+
+        return {
+            ...response.data,
+            voucherUsageUpdateFailed,
+        };
     },
 };

@@ -7,6 +7,7 @@ import { useToast } from '../../../components/common/Toast';
 import { orderService } from '../../../services/orderService';
 import { formatCurrency } from '../../../utils/formatCurrency';
 import CartSummary from '../components/CartSummary';
+import { voucherService } from '../../../services/voucherService';
 
 const CheckoutPage = () => {
     const { user } = useContext(AuthContext);
@@ -18,6 +19,10 @@ const CheckoutPage = () => {
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [needsHistoryCheck, setNeedsHistoryCheck] = useState(false);
+    const [voucherCode, setVoucherCode] = useState('');
+    const [appliedVoucher, setAppliedVoucher] = useState(null);
+    const [voucherMessage, setVoucherMessage] = useState('');
+    const [isValidatingVoucher, setIsValidatingVoucher] = useState(false);
     const submittingRef = useRef(false);
     const session = useRef(0);
 
@@ -40,10 +45,61 @@ const CheckoutPage = () => {
         setError('');
     };
 
+    const handleApplyVoucher = async () => {
+        if (isValidatingVoucher || isSubmitting) return;
+
+        const code = voucherCode.trim();
+
+        if (!code) {
+            setVoucherMessage('Vui lòng nhập mã voucher.');
+            setAppliedVoucher(null);
+            return;
+        }
+
+        setIsValidatingVoucher(true);
+        setVoucherMessage('');
+        setAppliedVoucher(null);
+
+        try {
+            const result = await voucherService.validateVoucher(
+                code,
+                subtotal
+            );
+
+            if (!result.isValid) {
+                setVoucherMessage(result.message);
+                return;
+            }
+
+            setAppliedVoucher(result);
+            setVoucherCode(result.voucher.code);
+
+            setVoucherMessage(result.message);
+        } catch (error) {
+            setVoucherMessage(
+                error.message || 'Không thể kiểm tra voucher. Vui lòng thử lại.'
+            );
+        } finally {
+            setIsValidatingVoucher(false);
+        }
+    };
+
+    const handleRemoveVoucher = () => {
+        setAppliedVoucher(null);
+        setVoucherCode('');
+        setVoucherMessage('');
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (submittingRef.current || isLoading || isUpdating || !userId) {
+        if (
+            submittingRef.current ||
+            isLoading ||
+            isUpdating ||
+            isValidatingVoucher ||
+            !userId
+        ) {
             return;
         }
 
@@ -61,7 +117,12 @@ const CheckoutPage = () => {
                 recipientName: form.recipientName,
                 phone: form.phone,
                 shippingAddress: form.shippingAddress,
-                expectedItems: cartItems.map((item) => ({ id: item.id, price: item.price, quantity: item.quantity })),
+          expectedItems: cartItems.map((item) => ({
+              id: item.id,
+              price: item.price,
+              quantity: item.quantity
+          })),
+          voucherCode: appliedVoucher?.voucher?.code ?? null,
             });
         } catch (requestError) {
             if (ownerSession !== session.current) return;
@@ -104,13 +165,18 @@ const CheckoutPage = () => {
 
         if (ownerSession !== session.current) return;
 
-        if (cleared) {
-            toast.success(
-                `Đã tạo đơn hàng #${createdOrder.id}.`
+        if (createdOrder.voucherUsageUpdateFailed) {
+            toast.info(
+                `Đơn #${createdOrder.id} đã được tạo, nhưng chưa cập nhật được lượt sử dụng voucher.`
             );
+        } else if (cleared) {
+            toast.success(`Đã tạo đơn hàng #${createdOrder.id}.`);
         } else {
             toast.info(
-                `Đơn #${createdOrder.id} đã được tạo. Giỏ hàng được giữ lại vì có thay đổi hoặc chưa xóa được. Hãy kiểm tra trước khi mua tiếp.`);
+                `Đơn #${createdOrder.id} đã được tạo, ` +
+                'nhưng chưa xóa được giỏ hàng. ' +
+                'Hãy kiểm tra lịch sử trước khi đặt lại.'
+            );
         }
         navigate('/orders/history', { replace: true });
     };
@@ -236,7 +302,60 @@ const CheckoutPage = () => {
                                     </li>
                                 ))}
                             </ul>
-                            <CartSummary subtotal={subtotal} />
+                            <div className="border-top pt-3 mt-3">
+                                <h4 className="h6 mb-3">Mã giảm giá</h4>
+
+                                <div className="input-group">
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Nhập mã voucher"
+                                        value={voucherCode}
+                                        onChange={(event) => {
+                                            setVoucherCode(event.target.value);
+                                            setAppliedVoucher(null);
+                                            setVoucherMessage('');
+                                        }}
+                                        disabled={isBusy || isValidatingVoucher}
+                                    />
+
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-primary"
+                                        onClick={handleApplyVoucher}
+                                        disabled={isBusy || isValidatingVoucher || !voucherCode.trim()}
+                                    >
+                                        {isValidatingVoucher ? 'Đang kiểm tra...' : 'Áp dụng'}
+                                    </button>
+                                </div>
+
+                                {voucherMessage && (
+                                    <p
+                                        className={`small mt-2 mb-2 ${appliedVoucher ? 'text-success' : 'text-danger'
+                                            }`}
+                                        role="status"
+                                    >
+                                        {voucherMessage}
+                                    </p>
+                                )}
+
+                                {appliedVoucher && (
+                                    <button
+                                        type="button"
+                                        className="btn btn-sm btn-outline-danger mt-1"
+                                        onClick={handleRemoveVoucher}
+                                        disabled={isBusy}
+                                    >
+                                        <icon name="x" /> Gỡ voucher
+                                    </button>
+                                )}
+                            </div>
+
+                            <CartSummary
+                                subtotal={subtotal}
+                                discountAmount={appliedVoucher?.discountAmount ?? 0}
+                                voucherCode={appliedVoucher?.voucher?.code ?? null}
+                            />
                         </div>
                     </div>
                 </div>
