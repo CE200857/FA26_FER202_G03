@@ -3,7 +3,15 @@ import md5 from "md5";
 
 const API_URL = "http://localhost:5001";
 
-const getUsers = () => storageService.get(STORAGE_KEYS.USERS, []);
+const getUsers = async () => {
+  const response = await fetch(`${API_URL}/users`);
+
+  if (!response.ok) {
+    throw new Error("Không thể tải danh sách tài khoản.");
+  }
+
+  return response.json();
+};
 
 export const userService = {
   getUserById: (id) => {
@@ -69,28 +77,30 @@ export const userService = {
       .then(() => true);
   },
 
-  getAllUsers: () =>
-    getUsers().map((u) => ({
-      id: u.id,
-      name: u.name,
-      email: u.email,
-      role: u.role,
-      phone: u.phone || "",
-      status: u.status,
-    })),
+  getAllUsers: async () => {
+    const users = await getUsers();
 
-  createUser: ({ name, email, password, phone, role }) => {
-    const users = getUsers();
+    return users.map((user) => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      phone: user.phone || "",
+      status: user.status,
+    }));
+  },
+  createUser: async ({ name, email, password, phone, role }) => {
+    const users = await getUsers();
 
-    const isEmailExist = users.some(
-      (u) => u.email.toLowerCase() === email.toLowerCase(),
+    const emailExists = users.some(
+      (user) => user.email.toLowerCase() === email.toLowerCase(),
     );
-    if (isEmailExist) {
+
+    if (emailExists) {
       throw new Error("Email này đã được sử dụng!");
     }
 
     const newUser = {
-      id: "U" + new Date().getTime(),
       name,
       email,
       password: md5(password),
@@ -98,69 +108,86 @@ export const userService = {
       role,
       status: "active",
     };
-    storageService.set(STORAGE_KEYS.USERS, [...users, newUser]);
+
+    const response = await fetch(`${API_URL}/users`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newUser),
+    });
+
+    if (!response.ok) {
+      throw new Error("Không thể thêm tài khoản.");
+    }
+
+    const createdUser = await response.json();
 
     return {
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-      phone: newUser.phone,
-      status: newUser.status,
+      id: createdUser.id,
+      name: createdUser.name,
+      email: createdUser.email,
+      role: createdUser.role,
+      phone: createdUser.phone || "",
+      status: createdUser.status,
     };
   },
 
-  updateUser: (id, { name, phone, role }) => {
-    const users = getUsers();
-    const target = users.find((u) => u.id === id);
+  updateUser: async (id, { name, phone, role }) => {
+    const response = await fetch(`${API_URL}/users/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, phone, role }),
+    });
 
-    if (!target) {
-      throw new Error("Không tìm thấy người dùng!");
+    if (!response.ok) {
+      throw new Error("Không thể cập nhật tài khoản.");
     }
 
-    const updatedUsers = users.map((u) =>
-      u.id === id ? { ...u, name, phone, role } : u,
-    );
-    storageService.set(STORAGE_KEYS.USERS, updatedUsers);
+    const updatedUser = await response.json();
 
     const currentUser = storageService.get(STORAGE_KEYS.CURRENT_USER, null);
+
     if (currentUser && currentUser.id === id) {
       storageService.set(STORAGE_KEYS.CURRENT_USER, {
-        id: target.id,
-        name,
-        email: target.email,
-        role,
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
       });
     }
 
     return {
-      id: target.id,
-      name,
-      email: target.email,
-      role,
-      phone,
-      status: target.status,
+      id: updatedUser.id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      phone: updatedUser.phone || "",
+      status: updatedUser.status,
     };
   },
 
-  toggleUserStatus: (id, currentUserId) => {
+  toggleUserStatus: async (id, currentUserId) => {
     if (id === currentUserId) {
       throw new Error("Không thể khóa chính tài khoản đang đăng nhập!");
     }
 
-    const users = getUsers();
-    const target = users.find((u) => u.id === id);
+    const users = await getUsers();
+    const user = users.find((item) => item.id === id);
 
-    if (!target) {
+    if (!user) {
       throw new Error("Không tìm thấy người dùng!");
     }
 
-    const newStatus = target.status === "active" ? "locked" : "active";
-    const updatedUsers = users.map((u) =>
-      u.id === id ? { ...u, status: newStatus } : u,
-    );
+    const newStatus = user.status === "active" ? "locked" : "active";
 
-    storageService.set(STORAGE_KEYS.USERS, updatedUsers);
+    const response = await fetch(`${API_URL}/users/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: newStatus }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Không thể thay đổi trạng thái tài khoản.");
+    }
 
     return newStatus;
   },
