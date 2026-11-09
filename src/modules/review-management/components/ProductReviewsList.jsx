@@ -11,15 +11,15 @@ const ProductReviewsList = ({ productId, orderId, currentUser }) => {
   const [loading, setLoading] = useState(true);
   const [starFilter, setStarFilter] = useState('all');
 
+  const userId = currentUser?.id || currentUser?.userId;
+
   const fetchReviewsData = useCallback(async () => {
     setLoading(true);
     try {
       const [list, sumData, hasBought] = await Promise.all([
         reviewService.getReviewsByProductId(productId),
         reviewService.getReviewSummary(productId),
-        currentUser?.id
-          ? reviewService.canUserReview(currentUser.id, productId, orderId)
-          : false,
+        userId ? reviewService.canUserReview(userId, productId, orderId) : false,
       ]);
 
       setReviews(list || []);
@@ -30,20 +30,20 @@ const ProductReviewsList = ({ productId, orderId, currentUser }) => {
     } finally {
       setLoading(false);
     }
-  }, [productId, orderId, currentUser?.id]);
+  }, [productId, orderId, userId]);
 
   useEffect(() => {
     fetchReviewsData();
   }, [fetchReviewsData]);
 
-  // Kiểm tra xem user hiện tại đã viết đánh giá cho SẢN PHẨM NÀY trong ĐƠN HÀNG NÀY chưa
+  // Kiểm tra xem đã đánh giá cho ĐƠN HÀNG NÀY chưa
   const hasUserReviewedThisOrder = reviews.some((r) => {
-    const isSameUser = String(r.userId) === String(currentUser?.id);
-    const isSameProduct = String(r.productId) === String(productId);
+    const isSameUser = String(r.userId).trim() === String(userId).trim();
+    const isSameProduct = String(r.productId).trim() === String(productId).trim();
     if (!isSameUser || !isSameProduct) return false;
 
     if (orderId) {
-      return String(r.orderId) === String(orderId);
+      return String(r.orderId).trim() === String(orderId).trim();
     }
     return false;
   });
@@ -53,11 +53,11 @@ const ProductReviewsList = ({ productId, orderId, currentUser }) => {
       await reviewService.createReview({
         productId,
         orderId,
-        userId: currentUser.id,
+        userId,
         userName: currentUser.name || currentUser.userName || 'Khách hàng',
         ...formData,
       });
-      alert('Đã gửi đánh giá cho đơn hàng thành công!');
+      alert('Đã gửi đánh giá thành công!');
       fetchReviewsData();
     } catch (err) {
       alert(err.message || 'Gửi đánh giá thất bại');
@@ -66,7 +66,7 @@ const ProductReviewsList = ({ productId, orderId, currentUser }) => {
 
   const handleUpdateReview = async (reviewId, updatedData) => {
     try {
-      await reviewService.updateReview(reviewId, currentUser.id, updatedData);
+      await reviewService.updateReview(reviewId, userId, updatedData);
       fetchReviewsData();
     } catch (err) {
       alert(err.message || 'Cập nhật thất bại');
@@ -76,7 +76,7 @@ const ProductReviewsList = ({ productId, orderId, currentUser }) => {
   const handleDeleteReview = async (reviewId) => {
     if (window.confirm('Bạn có chắc muốn xóa đánh giá này?')) {
       try {
-        await reviewService.deleteReview(reviewId, currentUser.id);
+        await reviewService.deleteReview(reviewId, userId);
         fetchReviewsData();
       } catch (err) {
         alert(err.message || 'Xóa thất bại');
@@ -90,7 +90,7 @@ const ProductReviewsList = ({ productId, orderId, currentUser }) => {
 
   return (
     <div className="product-reviews-container">
-      {/* 1. KHỐI TỔNG QUAN */}
+      {/* 1. TỔNG QUAN ĐÁNH GIÁ */}
       <div className="bg-light p-4 rounded-3 border mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div>
           <h5 className="fw-bold mb-1">Đánh giá từ khách hàng</h5>
@@ -115,10 +115,10 @@ const ProductReviewsList = ({ productId, orderId, currentUser }) => {
         </div>
       </div>
 
-      {/* 2. KHỐI FORM VIẾT ĐÁNH GIÁ */}
-      {!currentUser?.id ? (
+      {/* 2. HIỂN THỊ FORM HOẶC THÔNG BÁO */}
+      {!userId ? (
         <div className="alert alert-warning border-0 shadow-sm rounded-3 mb-4">
-          🔒 Vui lòng <strong>đăng nhập</strong> tài khoản đã mua sản phẩm để viết đánh giá.
+          🔒 Vui lòng <strong>đăng nhập</strong> tài khoản để gửi đánh giá.
         </div>
       ) : !canReview ? (
         <div className="alert alert-secondary border-0 shadow-sm rounded-3 mb-4">

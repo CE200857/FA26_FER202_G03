@@ -28,7 +28,7 @@ const ReviewModeration = () => {
   const handleDelete = async (reviewId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa đánh giá này?")) {
       try {
-        await reviewService.deleteReview(reviewId, null, true);
+        await reviewService.deleteReview(reviewId);
         fetchAllReviews();
       } catch (error) {
         alert("Lỗi xóa bài: " + (error.message || error));
@@ -36,7 +36,7 @@ const ReviewModeration = () => {
     }
   };
 
-  // Kết hợp lọc từ khóa tìm kiếm và lọc theo số sao
+  // Lọc theo từ khóa tìm kiếm + số sao (Không dùng trạng thái Duyệt/Ẩn)
   const displayedReviews = reviews.filter((review) => {
     const term = searchTerm.toLowerCase();
     const matchesSearch =
@@ -52,7 +52,7 @@ const ReviewModeration = () => {
 
   return (
     <div className="review-moderation-page p-4 bg-white rounded-3 shadow-sm border">
-      {/* HEADER HÀNG ĐẦU */}
+      {/* HEADER & TÌM KIẾM */}
       <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-3">
         <div>
           <h4 className="fw-bold text-dark mb-1">Quản lý Đánh giá sản phẩm (Admin)</h4>
@@ -70,13 +70,13 @@ const ReviewModeration = () => {
         />
       </div>
 
-      {/* BỘ LỌC SAO DẠNG NÚT PILL */}
+      {/* BỘ LỌC THEO SỐ SAO */}
       <div className="d-flex align-items-center gap-2 mb-4 flex-wrap pb-3 border-bottom">
         <span className="fw-bold small text-secondary me-2">Lọc theo số sao:</span>
         {['all', 5, 4, 3, 2, 1].map((star) => {
-          const count = star === 'all' 
-            ? reviews.length 
-            : reviews.filter(r => Number(r.rating) === Number(star)).length;
+          const count = star === 'all'
+            ? reviews.length
+            : reviews.filter((r) => Number(r.rating) === Number(star)).length;
 
           return (
             <button
@@ -95,7 +95,7 @@ const ReviewModeration = () => {
         })}
       </div>
 
-      {/* BẢNG DANH SÁCH */}
+      {/* BẢNG DANH SÁCH BÀI ĐÁNH GIÁ */}
       {loading ? (
         <div className="text-center py-4 text-muted">Đang tải dữ liệu...</div>
       ) : (
@@ -115,7 +115,7 @@ const ReviewModeration = () => {
               {displayedReviews.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="text-center py-4 text-muted fst-italic">
-                    Không tìm thấy đánh giá nào trong danh mục này.
+                    Không tìm thấy đánh giá nào phù hợp bộ lọc.
                   </td>
                 </tr>
               ) : (

@@ -5,8 +5,8 @@ import { reviewService } from '../../../services/reviewService';
 const ReviewModerationPage = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [starFilter, setStarFilter] = useState('all');
 
   const fetchAllReviews = useCallback(async () => {
     setLoading(true);
@@ -25,19 +25,10 @@ const ReviewModerationPage = () => {
     fetchAllReviews();
   }, [fetchAllReviews]);
 
-  const handleModerate = async (reviewId, newStatus) => {
-    try {
-      await reviewService.moderateReview(reviewId, newStatus);
-      fetchAllReviews();
-    } catch (error) {
-      alert("Lỗi duyệt bài: " + (error.message || error));
-    }
-  };
-
   const handleDelete = async (reviewId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa hẳn đánh giá này?")) {
       try {
-        await reviewService.deleteReview(reviewId, null, true);
+        await reviewService.deleteReview(reviewId);
         fetchAllReviews();
       } catch (error) {
         alert("Lỗi xóa bài: " + (error.message || error));
@@ -46,21 +37,24 @@ const ReviewModerationPage = () => {
   };
 
   const displayedReviews = reviews.filter((review) => {
-    const currentStatus = review.status || 'pending';
-    const matchesStatus = statusFilter === 'all' || currentStatus === statusFilter;
+    const term = searchTerm.toLowerCase();
     const matchesSearch =
-      (review.userName && review.userName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (review.comment && review.comment.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (review.productId && String(review.productId).toLowerCase().includes(searchTerm.toLowerCase()));
+      (review.userName && review.userName.toLowerCase().includes(term)) ||
+      (review.comment && review.comment.toLowerCase().includes(term)) ||
+      (review.productId && String(review.productId).toLowerCase().includes(term));
 
-    return matchesStatus && matchesSearch;
+    const matchesStar =
+      starFilter === 'all' ? true : Number(review.rating) === Number(starFilter);
+
+    return matchesSearch && matchesStar;
   });
 
   return (
     <div className="review-moderation-page p-4 bg-white rounded-3 shadow-sm border">
-      <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+      {/* HEADER & TÌM KIẾM */}
+      <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-3">
         <div>
-          <h4 className="fw-bold text-dark mb-1">Quản lý & Kiểm duyệt Đánh giá (Admin)</h4>
+          <h4 className="fw-bold text-dark mb-1">Quản lý Đánh giá sản phẩm (Admin)</h4>
           <span className="text-muted small">
             Tổng số: <strong>{reviews.length}</strong> đánh giá
           </span>
@@ -75,25 +69,32 @@ const ReviewModerationPage = () => {
         />
       </div>
 
-      <div className="mb-4 border-bottom pb-3 d-flex gap-2 flex-wrap">
-        {[
-          { key: 'all', label: 'Tất cả' },
-          { key: 'pending', label: 'Chờ duyệt' },
-          { key: 'approved', label: 'Đã duyệt' },
-          { key: 'rejected', label: 'Đã từ chối / Ẩn' },
-        ].map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setStatusFilter(tab.key)}
-            className={`btn btn-sm rounded-pill ${
-              statusFilter === tab.key ? 'btn-primary' : 'btn-outline-secondary'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      {/* BỘ LỌC THEO SỐ SAO */}
+      <div className="d-flex align-items-center gap-2 mb-4 flex-wrap pb-3 border-bottom">
+        <span className="fw-bold small text-secondary me-2">Lọc theo số sao:</span>
+        {['all', 5, 4, 3, 2, 1].map((star) => {
+          const count = star === 'all'
+            ? reviews.length
+            : reviews.filter((r) => Number(r.rating) === Number(star)).length;
+
+          return (
+            <button
+              key={star}
+              type="button"
+              onClick={() => setStarFilter(star)}
+              className={`btn btn-sm rounded-pill px-3 ${
+                String(starFilter) === String(star)
+                  ? 'btn-primary'
+                  : 'btn-outline-secondary'
+              }`}
+            >
+              {star === 'all' ? `Tất cả (${count})` : `${star} ★ (${count})`}
+            </button>
+          );
+        })}
       </div>
 
+      {/* BẢNG DANH SÁCH BÀI ĐÁNH GIÁ */}
       {loading ? (
         <div className="text-center py-4 text-muted">Đang tải dữ liệu...</div>
       ) : (
@@ -105,7 +106,7 @@ const ReviewModerationPage = () => {
                 <th>Sản phẩm (ID)</th>
                 <th className="text-center">Sao</th>
                 <th>Nội dung nhận xét</th>
-                <th className="text-center">Trạng thái</th>
+                <th className="text-center">Ngày đăng</th>
                 <th className="text-center">Hành động</th>
               </tr>
             </thead>
@@ -113,41 +114,27 @@ const ReviewModerationPage = () => {
               {displayedReviews.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="text-center py-4 text-muted fs-6 italic">
-                    Không tìm thấy đánh giá nào trong danh mục này.
+                    Không tìm thấy đánh giá nào phù hợp bộ lọc.
                   </td>
                 </tr>
               ) : (
                 displayedReviews.map((review) => (
                   <tr key={review.id}>
                     <td className="fw-bold text-dark">{review.userName || 'Khách hàng'}</td>
-                    <td className="text-secondary">{review.productId}</td>
+                    <td className="text-secondary fw-semibold">{review.productId}</td>
                     <td className="text-center text-warning fw-bold">{review.rating} ★</td>
                     <td className="text-secondary" style={{ maxWidth: '300px' }}>{review.comment}</td>
-                    <td className="text-center">
-                      <span className={`badge ${
-                        review.status === 'approved' ? 'bg-success' :
-                        review.status === 'rejected' ? 'bg-danger' : 'bg-warning text-dark'
-                      }`}>
-                        {review.status === 'approved' ? 'Đã duyệt' :
-                         review.status === 'rejected' ? 'Đã ẩn' : 'Chờ duyệt'}
-                      </span>
+                    <td className="text-center text-muted small">
+                      {review.createdAt ? new Date(review.createdAt).toLocaleDateString('vi-VN') : '—'}
                     </td>
                     <td className="text-center">
-                      <div className="btn-group btn-group-sm">
-                        {review.status !== 'approved' && (
-                          <button onClick={() => handleModerate(review.id, 'approved')} className="btn btn-outline-success">
-                            Duyệt
-                          </button>
-                        )}
-                        {review.status !== 'rejected' && (
-                          <button onClick={() => handleModerate(review.id, 'rejected')} className="btn btn-outline-warning text-dark">
-                            Ẩn
-                          </button>
-                        )}
-                        <button onClick={() => handleDelete(review.id)} className="btn btn-outline-danger">
-                          Xóa
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(review.id)}
+                        className="btn btn-sm btn-outline-danger px-3 rounded-pill"
+                      >
+                        Xóa
+                      </button>
                     </td>
                   </tr>
                 ))
