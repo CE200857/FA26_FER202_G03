@@ -1,85 +1,125 @@
-import { storageService } from './storageService';
+import axios from 'axios';
 import { voucherService } from './voucherService';
 
-const CLAIMS_KEY = 'spa_voucher_claims';
+const claimApi = axios.create({
+    baseURL: 'http://localhost:5001',
+    timeout: 10000,
+});
+
+const CLAIM_URL = '/voucherClaims';
 
 export const voucherClaimService = {
-  getAll() {
-    return storageService.get(CLAIMS_KEY, []);
-  },
+    // Lấy toàn bộ lượt nhận voucher
+    async getAll() {
+        try {
+            const { data } = await claimApi.get(CLAIM_URL);
 
-  getByUser(userId) {
-    return this.getAll().filter(
-      (claim) => claim.userId === userId
-    );
-  },
+            if (!Array.isArray(data)) {
+                throw new Error('Dữ liệu voucher đã nhận không hợp lệ.');
+            }
 
-  hasClaimed(userId, voucherId) {
-    return this.getAll().some(
-      (claim) =>
-        claim.userId === userId &&
-        claim.voucherId === voucherId
-    );
-  },
+            return data;
+        } catch (error) {
+            console.error('Lỗi lấy danh sách voucher đã nhận:', error);
 
-  claim(userId, voucherId) {
-    if (!userId) {
-      throw new Error('Vui lòng đăng nhập để nhận voucher.');
-    }
+            if (error.message === 'Dữ liệu voucher đã nhận không hợp lệ.') {
+                throw error;
+            }
 
-    const voucher = voucherService.getById(voucherId);
+            throw new Error('Không thể tải danh sách voucher đã nhận.');
+        }
+    },
 
-    if (!voucher) {
-      throw new Error('Không tìm thấy voucher.');
-    }
+    // Lấy voucher đã nhận của một người dùng
+    async getByUser(userId) {
+        if (!userId) return [];
 
-    if (!voucher.isActive) {
-      throw new Error('Voucher hiện không hoạt động.');
-    }
+        try {
+            const { data } = await claimApi.get(CLAIM_URL, {
+                params: { userId },
+            });
 
-    if (voucher.expiryDate < this.getTodayDate()) {
-      throw new Error('Voucher đã hết hạn.');
-    }
+            if (!Array.isArray(data)) {
+                throw new Error('Dữ liệu voucher đã nhận không hợp lệ.');
+            }
 
-    if (
-      Number(voucher.usedCount) >=
-      Number(voucher.usageLimit)
-    ) {
-      throw new Error('Voucher đã hết lượt sử dụng.');
-    }
+            return data;
+        } catch (error) {
+            console.error('Lỗi lấy voucher theo người dùng:', error);
 
-    if (this.hasClaimed(userId, voucherId)) {
-      throw new Error('Bạn đã nhận voucher này rồi.');
-    }
+            if (error.message === 'Dữ liệu voucher đã nhận không hợp lệ.') {
+                throw error;
+            }
 
-    const newClaim = {
-      id: `VC${Date.now()}`,
-      userId,
-      voucherId,
-      claimedAt: new Date().toISOString(),
-    };
+            throw new Error('Không thể tải voucher đã nhận.');
+        }
+    },
 
-    const claims = this.getAll();
+    // Kiểm tra người dùng đã nhận voucher chưa
+    async hasClaimed(userId, voucherId) {
+        const claims = await this.getByUser(userId);
 
-    const saved = storageService.set(
-      CLAIMS_KEY,
-      [...claims, newClaim]
-    );
+        return claims.some(
+            (claim) => String(claim.voucherId) === String(voucherId)
+        );
+    },
 
-    if (!saved) {
-      throw new Error('Không thể lưu voucher.');
-    }
+    // Nhận voucher
+    async claim(userId, voucherId) {
+        if (!userId) {
+            throw new Error('Vui lòng đăng nhập để nhận voucher.');
+        }
 
-    return newClaim;
-  },
+        const voucher = await voucherService.getById(voucherId);
 
-  getTodayDate() {
-    const today = new Date();
+        if (!voucher) {
+            throw new Error('Không tìm thấy voucher.');
+        }
 
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
+        if (!voucher.isActive) {
+            throw new Error('Voucher hiện không hoạt động.');
+        }
 
-    return `${year}-${month}-${day}`;
-  },
+        if (!voucher.expiryDate || voucher.expiryDate < this.getTodayDate()) {
+            throw new Error('Voucher đã hết hạn.');
+        }
+
+        if (
+            Number(voucher.usedCount) >=
+            Number(voucher.usageLimit)
+        ) {
+            throw new Error('Voucher đã hết lượt sử dụng.');
+        }
+
+        const alreadyClaimed = await this.hasClaimed(userId, voucherId);
+
+        if (alreadyClaimed) {
+            throw new Error('Bạn đã nhận voucher này rồi.');
+        }
+
+        const newClaim = {
+            id: `VC${Date.now()}`,
+            userId,
+            voucherId,
+            claimedAt: new Date().toISOString(),
+        };
+
+        try {
+            const { data } = await claimApi.post(CLAIM_URL, newClaim);
+            return data;
+        } catch (error) {
+            console.error('Lỗi nhận voucher:', error);
+            throw new Error('Không thể lưu voucher. Vui lòng thử lại.');
+        }
+    },
+
+    // Lấy ngày hiện tại theo định dạng YYYY-MM-DD
+    getTodayDate() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    },
 };
