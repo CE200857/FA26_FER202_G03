@@ -162,6 +162,30 @@ export const voucherService = {
         };
     },
 
+    // Tăng số lượt sử dụng voucher sau khi đặt hàng thành công
+    async incrementUsedCount(id) {
+        const voucher = await this.getById(id);
+
+        if (!voucher) {
+            throw new Error('Không tìm thấy voucher để cập nhật lượt sử dụng.');
+        }
+
+        const usedCount = Number(voucher.usedCount ?? 0);
+
+        if (!Number.isSafeInteger(usedCount) || usedCount < 0) {
+            throw new Error('Số lượt sử dụng voucher không hợp lệ.');
+        }
+
+        const { data } = await voucherApi.patch(
+            `${VOUCHER_URL}/${encodeURIComponent(id)}`,
+            {
+                usedCount: usedCount + 1,
+            }
+        );
+
+        return data;
+    },
+
     // Tạo voucher mới
     async create(voucherData) {
         const vouchers = await this.getAll();
