@@ -1,26 +1,28 @@
+// src/routes/AppRouter.jsx
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import CustomerLayout from '../layouts/CustomerLayout';
 import AdminLayout from '../layouts/AdminLayout';
 import ProtectedRoute from './ProtectedRoute';
+
 import ProductCatalogPage from '../modules/product-management/pages/ProductCatalogPage';
 import ProductDetailPage from '../modules/product-management/pages/ProductDetailPage';
 import AdminDashboardPage from '../modules/product-management/pages/AdminDashboardPage';
+import ProductManagementPage from '../modules/product-management/pages/ProductManagementPage';
 import LoginPage from '../modules/account-management/pages/LoginPage';
 import RegisterPage from '../modules/account-management/pages/RegisterPage';
-import UserProfilePage from '../modules/account-management/pages/UserPageProfile';
-import UpdateProfilePage from '../modules/account-management/pages/UpdateProfilePage';
-import ChangePasswordPage from '../modules/account-management/pages/ChangePasswordPage';
+import UserProfilePage from "../modules/account-management/pages/UserPageProfile";
+import UpdateProfilePage from "../modules/account-management/pages/UpdateProfilePage";
+import ChangePasswordPage from "../modules/account-management/pages/ChangePasswordPage";
 import UserManagement from '../modules/account-management/components/UserManagement';
 import VoucherManagementPage from '../modules/voucher-management/pages/VoucherManagementPage';
 import MyVouchersPage from '../modules/voucher-management/pages/MyVouchersPage';
 import ReviewManagementPage from '../modules/review-management/pages/ReviewManagementPage';
+import ProductReviewPage from '../modules/review-management/pages/ProductReviewPage';
 import OrderHistoryPage from '../modules/cart-order/pages/OrderHistoryPage';
 import CheckoutPage from '../modules/cart-order/pages/CheckoutPage';
 import OrderManagement from '../modules/cart-order/components/OrderManagement';
-import ProductReviewPage from "../modules/review-management/pages/ProductReviewPage";
-import ProductManagementPage from '../modules/product-management/pages/ProductManagementPage';
 const PlaceholderPage = ({ title }) => (
     <section style={{ padding: '24px', background: '#fff', borderRadius: '8px' }}>
         <h2>{title}</h2>
