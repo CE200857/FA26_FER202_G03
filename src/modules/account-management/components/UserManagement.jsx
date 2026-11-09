@@ -25,16 +25,14 @@ const UserManagement = () => {
   const [message, setMessage] = useState("");
 
   const reloadUsers = async () => {
-    try {
-      const data = await userService.getAllUsers();
-      setUsers(data);
-    } catch (error) {
-      setMessage(error.message);
-    }
+    const data = await userService.getAllUsers();
+    setUsers(data);
   };
 
   useEffect(() => {
-    reloadUsers();
+    reloadUsers().catch((error) => {
+      setMessage(error.message);
+    });
   }, []);
 
   const filteredUsers = users.filter((item) => {
