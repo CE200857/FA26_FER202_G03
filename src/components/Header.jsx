@@ -35,6 +35,9 @@ const Header = ({ onOpenCart, cartItemCount = 0 }) => {
                     <Nav.Link as={NavLink} to="/orders/history">
                       Đơn hàng
                     </Nav.Link>
+                    <Nav.Link as={NavLink} to="/reviews">
+                      Review
+                    </Nav.Link>
                   </>
                 )}
               </>
