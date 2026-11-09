@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Alert, Button, Form, Table } from "react-bootstrap";
 import { AuthContext } from "../../../context/AuthContext";
 import { userService } from "../../../services/userService";
@@ -15,7 +15,7 @@ const emptyForm = {
 const UserManagement = () => {
   const { user, updateUser: updateAuthUser } = useContext(AuthContext);
 
-  const [users, setUsers] = useState(() => userService.getAllUsers());
+  const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [formMode, setFormMode] = useState("");
@@ -24,9 +24,16 @@ const UserManagement = () => {
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
 
-  const reloadUsers = () => {
-    setUsers(userService.getAllUsers());
+  const reloadUsers = async () => {
+    const data = await userService.getAllUsers();
+    setUsers(data);
   };
+
+  useEffect(() => {
+    reloadUsers().catch((error) => {
+      setMessage(error.message);
+    });
+  }, []);
 
   const filteredUsers = users.filter((item) => {
     const keyword = searchTerm.trim().toLowerCase();
@@ -84,7 +91,7 @@ const UserManagement = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const isEdit = formMode === "edit";
@@ -97,7 +104,7 @@ const UserManagement = () => {
 
     try {
       if (isEdit) {
-        const updatedUser = userService.updateUser(editingId, {
+        const updatedUser = await userService.updateUser(editingId, {
           name: formData.name.trim(),
           phone: formData.phone.trim(),
           role: formData.role,
@@ -114,7 +121,7 @@ const UserManagement = () => {
 
         setMessage("Cập nhật tài khoản thành công.");
       } else {
-        userService.createUser({
+        await userService.createUser({
           name: formData.name.trim(),
           email: formData.email.trim(),
           password: formData.password,
@@ -125,14 +132,14 @@ const UserManagement = () => {
         setMessage("Thêm tài khoản thành công.");
       }
 
-      reloadUsers();
+      await reloadUsers();
       handleCancel();
     } catch (error) {
       setMessage(error.message);
     }
   };
 
-  const handleToggleStatus = (selectedUser) => {
+  const handleToggleStatus = async (selectedUser) => {
     const action = selectedUser.status === "active" ? "khóa" : "mở khóa";
 
     if (!window.confirm(`Bạn có muốn ${action} tài khoản này?`)) {
@@ -140,8 +147,8 @@ const UserManagement = () => {
     }
 
     try {
-      userService.toggleUserStatus(selectedUser.id, user.id);
-      reloadUsers();
+      await userService.toggleUserStatus(selectedUser.id, user.id);
+      await reloadUsers();
       setMessage(`Đã ${action} tài khoản thành công.`);
     } catch (error) {
       setMessage(error.message);
